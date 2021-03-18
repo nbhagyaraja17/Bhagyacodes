@@ -5,6 +5,9 @@ typedef long long ll;
 vector<ll> edges(4, 0);
 ll n, sum;
 
+// chinni said this is a brute force templete 
+// he took 4 edges and keep on add side to edge , every edge must add to any of the edge. If any side is 
+// not added to any edge that means NO.
 bool solve(vector<ll> &a, ll start)
 {
     if (start == n)
