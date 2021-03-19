@@ -8,38 +8,26 @@ const int mod = 1e9 + 7;
 ll n, ans, cnt;
 string s;
 
-void brute(ll p)
-{
-    if (p == n)
-    {
-        if (cnt == 0)
-            cout << s << "\n";
-    }
-    if (cnt > 0)
-    {
-        s.push_back(')');
-        cnt--;
-        brute(p + 1);
-    }
-    else
-    {
-        s.push_back('(');
-        cnt++;
-        brute(p + 1);
-    }
-}
-
 void solve()
 {
     cin >> n;
-    brute(0);
+    vector<int> a(n);
+    for (int i = 0; i < n; i++)
+        cin >> a[i];
+    sort(a.begin(), a.end());
+    do
+    {
+        for (auto i : a)
+            cout << i << " ";
+        cout << "\n";
+    } while (next_permutation(a.begin(), a.end()));
 }
 
 int main()
 {
     fast;
     int t = 1;
-    cin >> t;
+    //cin >> t;
     while (t--)
     {
         solve();
