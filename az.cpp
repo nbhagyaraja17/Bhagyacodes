@@ -7,8 +7,8 @@ using ll = long long;
 
 const int mod = 1e9 + 7;
 
-int n, ans;
-vector<int> queens;
+int n, ans, cnt;
+string s;
 template <class T>
 void print_data(T &a)
 {
@@ -18,35 +18,48 @@ void print_data(T &a)
     }
     cout << "\n";
 }
-
-bool check(int row, int col)
+ll power(ll x, ll y)
 {
-    for (int prow = 0; prow < row; prow++)
+    ll temp;
+    ll ans = 1;
+    while (y)
     {
-        int pcol = queens[prow];
-        if ((pcol == col) || (abs(prow - row) == abs(pcol - col)))
-            return 0;
+        if (y & 1)
+        {
+            ans = (1LL * ans * x) % mod;
+        }
+        x = (1LL * x * x) % mod;
+        y /= 2;
     }
-    return 1;
+    return ans;
 }
 
-void brute(int row)
+void brute(int level)
 {
-    //print_data(queens);
-    if (row == n)
+    print_data(s);
+    if (cnt < 0 || (n - level < cnt))
+        return;
+    if (level == n)
     {
-        ans++;
+        if (cnt == 0)
+        {
+            cout << s << "\n";
+            ans++;
+        }
         return;
     }
-    for (int col = 0; col < n; col++)
-    {
-        if (check(row, col))
-        {
-            queens.push_back(col);
-            brute(row + 1);
-            queens.pop_back();
-        }
-    }
+    // move
+    s += '(';
+    cnt++;
+    brute(level + 1);
+    cnt--;
+    s.pop_back();
+    // move
+    s += ')';
+    cnt--;
+    brute(level + 1);
+    cnt++;
+    s.pop_back();
 }
 
 void solve()
