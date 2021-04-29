@@ -7,8 +7,10 @@ using ll = long long;
 
 const int mod = 1e9 + 7;
 
-int n, ans, cnt;
-string s;
+// balanced paranthesis of depth k and size n
+// T.C  
+
+
 template <class T>
 void print_data(T &a)
 {
@@ -34,17 +36,32 @@ ll power(ll x, ll y)
     return ans;
 }
 
+int n, ans, cnt, k;
+string s;
+vector<string> sol;
+
 void brute(int level)
 {
-    print_data(s);
+    // print_data(s);
     if (cnt < 0 || (n - level < cnt))
         return;
     if (level == n)
     {
         if (cnt == 0)
         {
-            cout << s << "\n";
-            ans++;
+            int depth = 0, max_dep = 0;
+            for (int i = 0; i < s.length(); i++) // finding depth
+            {
+                if (s[i] == '(')
+                    depth++;
+                else
+                    depth--;
+                max_dep = max(max_dep, depth);
+                if (depth > k)
+                    return;
+            }
+            if (max_dep == k) // comparing depth
+                sol.push_back(s);
         }
         return;
     }
@@ -64,9 +81,13 @@ void brute(int level)
 
 void solve()
 {
-    cin >> n;
+    cin >> n >> k;
     brute(0);
-    cout << ans << "\n";
+    sort(sol.begin(), sol.end());
+    for (auto it : sol)
+    {
+        cout << it << "\n";
+    }
 }
 
 int main()
