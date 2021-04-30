@@ -7,9 +7,8 @@ using ll = long long;
 
 const int mod = 1e9 + 7;
 
-// balanced paranthesis of depth k and size n
-// T.C  
-
+// segment tree structure
+// T.C for updating logn , for sum logn so.. overall O(QlogN)
 
 template <class T>
 void print_data(T &a)
@@ -36,57 +35,70 @@ ll power(ll x, ll y)
     return ans;
 }
 
-int n, ans, cnt, k;
-string s;
-vector<string> sol;
+vector<int> arr(100100);
+vector<int> tree(400400);
+int n, q;
 
-void brute(int level)
+void build(int index, int l, int r)
 {
-    // print_data(s);
-    if (cnt < 0 || (n - level < cnt))
-        return;
-    if (level == n)
+    if (l == r)
     {
-        if (cnt == 0)
-        {
-            int depth = 0, max_dep = 0;
-            for (int i = 0; i < s.length(); i++) // finding depth
-            {
-                if (s[i] == '(')
-                    depth++;
-                else
-                    depth--;
-                max_dep = max(max_dep, depth);
-                if (depth > k)
-                    return;
-            }
-            if (max_dep == k) // comparing depth
-                sol.push_back(s);
-        }
+        tree[index] = arr[l];
         return;
     }
-    // move
-    s += '(';
-    cnt++;
-    brute(level + 1);
-    cnt--;
-    s.pop_back();
-    // move
-    s += ')';
-    cnt--;
-    brute(level + 1);
-    cnt++;
-    s.pop_back();
+    ll mid = (l + r) / 2;
+    build(2 * index, l, mid);
+    build(2 * index + 1, mid + 1, r);
+    tree[index] = tree[2 * index] + tree[2 * index + 1];
+}
+
+void update(int index, int l, int r, int x, int v)
+{
+    if (x < l || r < x)
+        return;
+    if (l == r)
+    {
+        tree[index] = v;
+        return;
+    }
+    ll mid = (l + r) / 2;
+    update(2 * index, l, mid, x, v);
+    update(2 * index + 1, mid + 1, r, x, v);
+    tree[index] = tree[2 * index] + tree[2 * index + 1];
+}
+
+ll sum_query(int index, int l, int r, int pleft, int pright)
+{
+    if (r < pleft || pright < l)
+        return 0;
+    if (pleft <= l && pright >= r)
+        return tree[index];
+    int mid = (l + r) / 2;
+    return (sum_query(2 * index, l, mid, pleft, pright) + sum_query(2 * index + 1, mid + 1, r, pleft, pright));
 }
 
 void solve()
 {
-    cin >> n >> k;
-    brute(0);
-    sort(sol.begin(), sol.end());
-    for (auto it : sol)
+    cin >> n >> q;
+    for (int i = 0; i < n; i++)
+        cin >> arr[i];
+    build(1, 0, n - 1);
+    while (q--)
     {
-        cout << it << "\n";
+        int ch;
+        cin >> ch;
+        if (ch == 1)
+        {
+            int x, v;
+            cin >> x >> v;
+            update(1, 0, n - 1, x, v);
+        }
+        else
+        {
+            int l, r;
+            cin >> l >> r;
+            cout << sum_query(1, 0, n - 1, l, r) << "\n";
+        }
     }
 }
 
