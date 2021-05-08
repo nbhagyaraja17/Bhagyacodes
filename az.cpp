@@ -7,27 +7,52 @@ using ll = long long;
 
 const int mod = 1e9 + 7;
 
+ll n;
+string s;
+
 void solve()
 {
-    ll x, y;
-    cin >> x >> y;
-    ll op = 0;
-    if (x >= y)
+    cin >> n;
+    cin >> s;
+    map<char, int> mp;
+    for (int i = 0; i < n; i++)
     {
-        cout << (x - y) << "\n";
+        mp[s[i]]++;
+    }
+    ll odd = 0;
+    for (int i = 0; i < n; i++)
+    {
+        if (mp[s[i]] % 2)
+        {
+            odd++;
+        }
+    }
+    if (n % 2 == 0)
+    {
+        if (odd)
+        {
+            cout << "-1\n";
+            return;
+        }
     }
     else
     {
-        while (y > x)
+        if (odd > 1)
         {
-            if (y & 1)
-                y++;
-            else
-                y /= 2;
-            op++;
+            cout << "-1\n";
+            return;
         }
-        cout << op + (x - y) << "\n";
     }
+    ll cnt = 0;
+    for (int i = 0; i < n / 2; i++)
+    {
+        if (s[i] != s[n - i - 1])
+        {
+            
+        }
+        deb(s);
+    }
+    cout << cnt << "\n";
 }
 
 int main()
