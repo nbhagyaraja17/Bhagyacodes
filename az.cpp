@@ -7,36 +7,32 @@ using ll = long long;
 
 const int mod = 1e9 + 7;
 
-int n, cnt;
-vector<int> arr;
-int dp[3030][3030];
+int n;
 
-// from that level how can you combine the level to n-1 elements addup to remsum.
-// from level 0 to level n-1 how many ways can you add the elements to make remsum that is n intially.
-// intial values are 0, n
-int rec(int level, int remsum)
+// O(nlogn) 
+int lis(vector<int> v)
 {
-    if (remsum < 0)
-        return 0;
-    if (level == n)
+    vector<int> temp;
+    for (auto x : v)
     {
-        return remsum == 0;
+        if (temp.empty() || temp.back() < x)
+            temp.push_back(x);
+        else
+        {
+            auto it = lower_bound(v.begin(), v.end(), x);
+            *it = x;
+        }
     }
-    if (dp[level][remsum] != -1)
-        return dp[level][remsum];
-    int ans = rec(level, remsum - arr[level]) + rec(level + 1, remsum);
-    return dp[level][remsum] = ans;
+    return temp.size(); // here we are just getting the longest subsequence length not the solution.
 }
+
 void solve()
 {
     cin >> n;
-    arr.resize(n + 1);
+    vector<int> arr(n);
     for (int i = 0; i < n; i++)
-    {
-        arr[i] = i + 1;
-    }
-    memset(dp, -1, sizeof(dp));
-    cout << rec(0, n);
+        cin >> arr[i];
+    cout << lis(arr);
 }
 
 int main()
