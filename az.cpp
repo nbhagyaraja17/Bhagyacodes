@@ -7,41 +7,36 @@ using ll = long long;
 
 const int mod = 1e9 + 7;
 
-int n;
+int n, cnt;
 vector<int> arr;
-int dp[100100];
+int dp[3030][3030];
 
-int rec(int level)
+// from that level how can you combine the level to n-1 elements addup to remsum.
+// from level 0 to level n-1 how many ways can you add the elements to make remsum that is n intially.
+// intial values are 0, n
+int rec(int level, int remsum)
 {
-    if (level < 0)
+    if (remsum < 0)
         return 0;
-    if (dp[level] != -1)
-        return dp[level];
-    int ans = 1;
-    for (int i = 0; i < level; i++)
+    if (level == n)
     {
-        if (arr[i] < arr[level])
-        {
-            ans = max(ans, rec(i) + 1);
-        }
+        return remsum == 0;
     }
-    return dp[level] = ans;
+    if (dp[level][remsum] != -1)
+        return dp[level][remsum];
+    int ans = rec(level, remsum - arr[level]) + rec(level + 1, remsum);
+    return dp[level][remsum] = ans;
 }
-
 void solve()
 {
     cin >> n;
-    arr.resize(n);
-    for (int i = 0; i < n; i++)
-        cin >> arr[i];
-    memset(dp, -1, sizeof(dp));
-    rec(n - 1);
-    int ans = 0;
+    arr.resize(n + 1);
     for (int i = 0; i < n; i++)
     {
-        ans = max(ans, dp[i]);
+        arr[i] = i + 1;
     }
-    cout << ans << "\n";
+    memset(dp, -1, sizeof(dp));
+    cout << rec(0, n);
 }
 
 int main()
