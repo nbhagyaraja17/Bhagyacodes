@@ -7,10 +7,13 @@ using ll = long long;
 
 const int mod = 1e9 + 7;
 
-int n;
+// you have been given two arrays and you have to find the longest possible subsequence length
 
-// O(nlogn) 
-int lis(vector<int> v)
+vector<int> A;
+int n, m;
+
+// overall the code is O(nlogn)
+int lis(vector<int> &v)
 {
     vector<int> temp;
     for (auto x : v)
@@ -28,11 +31,31 @@ int lis(vector<int> v)
 
 void solve()
 {
-    cin >> n;
-    vector<int> arr(n);
+    cin >> n >> m;
+    map<int, int> mp;
+    A.resize(n);
     for (int i = 0; i < n; i++)
-        cin >> arr[i];
-    cout << lis(arr);
+        cin >> A[i];
+    for (int i = 0; i < m; i++)
+    {
+        int d;
+        cin >> d;
+        mp[d] = i; // we assume elements in B as unique that's why we mapped.
+    }
+    // with the help of mapping now the B sets becomes like 0 1 2 3 4 ... m-1
+    // now accoring to those mapped values we also change values in A.
+    // now the longest increasing subsequence will be longest common subsequence
+    vector<int> temp;
+    // O(nlogn)
+    for (auto x : A)
+    {
+        if (mp.find(x) != mp.end())
+        {
+            temp.push_back(mp[x]);
+        }
+    }
+    // now we have to find the longest increasing subsequence in temp.
+    cout << lis(temp);
 }
 
 int main()
