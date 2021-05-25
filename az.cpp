@@ -7,55 +7,46 @@ using ll = long long;
 
 const int mod = 1e9 + 7;
 
-// you have been given two arrays and you have to find the longest possible subsequence length
+string s;
+int dp1[1010][1010];
 
-vector<int> A;
-int n, m;
-
-// overall the code is O(nlogn)
-int lis(vector<int> &v)
+// form 4 dp
+int rec1(int l, int r) // returns 1 if the substring from l to r is palindrome.
 {
-    vector<int> temp;
-    for (auto x : v)
+    if (l >= r)
+        return 1;
+    if (dp1[l][r] != -1)
+        return dp1[l][r];
+    int ans = 0;
+    if (rec1(l + 1, r - 1) && s[l] == s[r])
+        ans = 1;
+    return dp1[l][r] = ans;
+}
+
+int dp2[1010];
+
+// TC is O(n^2)
+int rec2(int i) // no. of min cuts from 0 to l
+{
+    if (i == -1)
+        return -1;
+    int ans = 1e9;
+    if (dp2[i] != -1)
+        return dp2[i];
+    for (int ch = 0; ch <= i; ch++)
     {
-        if (temp.empty() || temp.back() < x)
-            temp.push_back(x);
-        else
-        {
-            auto it = lower_bound(v.begin(), v.end(), x);
-            *it = x;
-        }
+        if (rec1(ch, i)) // this is O(1) for only one time it tooks 
+            ans = min(ans, rec2(ch - 1) + 1);
     }
-    return temp.size(); // here we are just getting the longest subsequence length not the solution.
+    return dp2[i] = ans;
 }
 
 void solve()
 {
-    cin >> n >> m;
-    map<int, int> mp;
-    A.resize(n);
-    for (int i = 0; i < n; i++)
-        cin >> A[i];
-    for (int i = 0; i < m; i++)
-    {
-        int d;
-        cin >> d;
-        mp[d] = i; // we assume elements in B as unique that's why we mapped.
-    }
-    // with the help of mapping now the B sets becomes like 0 1 2 3 4 ... m-1
-    // now accoring to those mapped values we also change values in A.
-    // now the longest increasing subsequence will be longest common subsequence
-    vector<int> temp;
-    // O(nlogn)
-    for (auto x : A)
-    {
-        if (mp.find(x) != mp.end())
-        {
-            temp.push_back(mp[x]);
-        }
-    }
-    // now we have to find the longest increasing subsequence in temp.
-    cout << lis(temp);
+    cin >> s;
+    memset(dp1, -1, sizeof(dp1));
+    memset(dp2, -1, sizeof(dp2));
+    cout << rec2((int)s.length() - 1);
 }
 
 int main()
