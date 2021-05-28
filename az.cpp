@@ -7,35 +7,42 @@ using ll = long long;
 
 const int mod = 1e9 + 7;
 
-int n;
+int dp[101][101];
+int X, Y;
 
-// given : string
-// print no. of distinct subsequences of that string.
+// two players are playing stones picking game. 
+// either you can take few stones from X, or from Y , or you have to take same no. of stones from X and Y at a time.
 
-// O(n) O(n)
+// O(N^3) O(N^2)
+int rec(int x, int y)// whether 1st player can win that x and y values or not.
+{
+    if (x == 0 && y == 0)
+        return 0;
+    if (dp[x][y] != -1)
+        return dp[x][y];
+    int win = 0;
+    for (int i = 1; i <= X; i++)
+    {
+        if (rec(x - i, y) == 0)
+            win = 1;
+    }
+    for (int i = 1; i <= Y; i++)
+    {
+        if (rec(x, y - i) == 0)
+            win = 1;
+    }
+    for (int i = 1; i <= min(X, Y); i++)
+    {
+        if (rec(x - i, y - i) == 0)
+            win = 1;
+    }
+    return dp[x][y] = win;
+}
 void solve()
 {
-    string s;
-    cin >> s;
-    n = (int)s.length();
-    int last[30];
-    memset(last, -1, sizeof(last));
-    int dp[n + 1]; // no. of distinct subsequence ending with that index.
-    int sum[n + 1];
-    dp[0] = 1; // empty is also a subsequence.
-    sum[0] = 1;
-    for (int i = 1; i <= n; i++) // level 1 (1 indexing)
-    {
-        dp[i] = sum[i - 1];
-        if (last[s[i - 1] - 'a'] > 0)
-            dp[i] -= dp[last[s[i - 1] - 'a']];
-        last[s[i - 1] - 'a'] = i;
-        sum[i] = sum[i - 1] + dp[i];
-    }
-    int ans = 0;
-    for (int i = 0; i < n; i++)
-        ans += dp[i];
-    cout << ans << endl;
+    cin >> X >> Y;
+    memset(dp, -1, sizeof(dp));
+    cout << rec(X, Y) << endl;
 }
 
 int main()
