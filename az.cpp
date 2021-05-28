@@ -7,45 +7,35 @@ using ll = long long;
 
 const int mod = 1e9 + 7;
 
-// no. of strings such that their length should be n and it should not contain "0100" as substring.
-
 int n;
-int dp[100100][4]; // bcoz string length is 4.
 
-// first we have to write automata on notes then we have to proceed.
-// That means we have to write the states for that particular string.
+// given : string
+// print no. of distinct subsequences of that string.
 
-int rec(int level, int match)
-{
-    if (level == n)
-        return 1;
-    int ans = 0;
-    if (dp[level][match] != -1)
-        return dp[level][match];
-    if (match == 0)
-    {
-        ans = rec(level + 1, 0) + rec(level + 1, 1);
-    }
-    else if (match == 1)
-    {
-        ans = rec(level + 1, 1) + rec(level + 1, 2);
-    }
-    else if (match == 2)
-    {
-        ans = rec(level + 1, 0) + rec(level + 1, 3);
-    }
-    else
-    {
-        ans = rec(level + 1, 0);
-    }
-    return dp[level][match] = ans;
-}
-
+// O(n) O(n)
 void solve()
 {
-    cin >> n;
-    memset(dp, -1, sizeof(dp));
-    cout << rec(0, 0) << endl;
+    string s;
+    cin >> s;
+    n = (int)s.length();
+    int last[30];
+    memset(last, -1, sizeof(last));
+    int dp[n + 1]; // no. of distinct subsequence ending with that index.
+    int sum[n + 1];
+    dp[0] = 1; // empty is also a subsequence.
+    sum[0] = 1;
+    for (int i = 1; i <= n; i++) // level 1 (1 indexing)
+    {
+        dp[i] = sum[i - 1];
+        if (last[s[i - 1] - 'a'] > 0)
+            dp[i] -= dp[last[s[i - 1] - 'a']];
+        last[s[i - 1] - 'a'] = i;
+        sum[i] = sum[i - 1] + dp[i];
+    }
+    int ans = 0;
+    for (int i = 0; i < n; i++)
+        ans += dp[i];
+    cout << ans << endl;
 }
 
 int main()
