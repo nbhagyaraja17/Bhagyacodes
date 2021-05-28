@@ -7,41 +7,50 @@ using ll = long long;
 
 const int mod = 1e9 + 7;
 
-vector<int> arr(505);
-int n;
-int dp[505][505];
+// no. of strings such that their length should be n and it should not contain "0100" as substring.
 
-// here the profit we get for merging is benifit and the profit is (a%100)*(b%100);
-int rec(int l, int r) // returns max benifit from [l to r]
+int n;
+int dp[100100][4]; // bcoz string length is 4.
+
+// first we have to write automata on notes then we have to proceed.
+// That means we have to write the states for that particular string.
+
+int rec(int level, int match)
 {
-    if (l == r) // for single element we don't need to merge so the benifit is 0.
-        return 0;
-    if (dp[l][r] != -1)
-        return dp[l][r];
-    int ans(0), sum(0), tot(0);
-    for (int i = l; i <= r; i++)
-        tot += arr[i];
-    for (int mid = l; mid < r; mid++)
+    if (level == n)
+        return 1;
+    int ans = 0;
+    if (dp[level][match] != -1)
+        return dp[level][match];
+    if (match == 0)
     {
-        sum += arr[mid];
-        ans = max(ans, rec(l, mid) + rec(mid + 1, r) + (sum % 100) * ((tot - sum) % 100));
+        ans = rec(level + 1, 0) + rec(level + 1, 1);
     }
-    return dp[l][r] = ans;
+    else if (match == 1)
+    {
+        ans = rec(level + 1, 1) + rec(level + 1, 2);
+    }
+    else if (match == 2)
+    {
+        ans = rec(level + 1, 0) + rec(level + 1, 3);
+    }
+    else
+    {
+        ans = rec(level + 1, 0);
+    }
+    return dp[level][match] = ans;
 }
 
 void solve()
 {
     cin >> n;
-    arr.resize(n);
     memset(dp, -1, sizeof(dp));
-    for (int i = 0; i < n; i++)
-        cin >> arr[i];
-    cout << rec(0, n - 1);
+    cout << rec(0, 0) << endl;
 }
 
 int main()
 {
-    fast;
+    ios_base::sync_with_stdio(0), cin.tie(0), cout.tie(0);
     int t = 1;
     //cin >> t;
     while (t--)
