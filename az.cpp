@@ -7,46 +7,66 @@ using ll = long long;
 
 const int mod = 1e9 + 7;
 
-int dp[101][101];
-int X, Y;
-
-// two players are playing stones picking game. 
-// either you can take few stones from X, or from Y , or you have to take same no. of stones from X and Y at a time.
-
-// O(N^3) O(N^2)
-int rec(int x, int y)// whether 1st player can win that x and y values or not.
+int arr[100100];
+int t[400400];
+int n;
+void update(int id, int l, int r, int lu, int ru, int v)
 {
-    if (x == 0 && y == 0)
+    if (r < lu || ru < l)
+        return;
+    if (lu <= l && ru >= r) // mist1
+    {
+        t[id] += v;
+        //cout << "update tid " << id << " " << t[id] << endl;
+        return;
+    }
+    int mid = (l + r) / 2;
+    update(2 * id, l, mid, lu, ru, v);
+    update(2 * id + 1, mid + 1, r, lu, ru, v);
+}
+int query(int id, int l, int r, int x)
+{
+    int sum = 0;
+    if (r < x || l > x)
         return 0;
-    if (dp[x][y] != -1)
-        return dp[x][y];
-    int win = 0;
-    for (int i = 1; i <= X; i++)
+    if (l == x && r == x)
+        return t[id];
+    if (l <= x && x <= r) // mist3 
     {
-        if (rec(x - i, y) == 0)
-            win = 1;
+        sum = t[id];
     }
-    for (int i = 1; i <= Y; i++)
-    {
-        if (rec(x, y - i) == 0)
-            win = 1;
-    }
-    for (int i = 1; i <= min(X, Y); i++)
-    {
-        if (rec(x - i, y - i) == 0)
-            win = 1;
-    }
-    return dp[x][y] = win;
+    int mid = (l + r) / 2;
+    return sum + query(2 * id, l, mid, x) + query(2 * id + 1, mid + 1, r, x); // mist2
 }
 void solve()
 {
-    cin >> X >> Y;
-    memset(dp, -1, sizeof(dp));
-    cout << rec(X, Y) << endl;
+    cin >> n;
+    for (int i = 0; i < n; i++)
+        cin >> arr[i];
+    int t;
+    cin >> t;
+    while (t--)
+    {
+        int q;
+        cin >> q;
+        if (q == 1)
+        {
+            int l, r, v;
+            cin >> l >> r >> v;
+            update(1, 0, n - 1, l, r, v);
+        }
+        else
+        {
+            int x;
+            cin >> x;
+            cout << query(1, 0, n - 1, x) + arr[x] << endl;
+        }
+    }
 }
 
 int main()
 {
+    //fast;
     ios_base::sync_with_stdio(0), cin.tie(0), cout.tie(0);
     int t = 1;
     //cin >> t;
