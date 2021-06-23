@@ -7,67 +7,104 @@ using ll = long long;
 
 const int mod = 1e9 + 7;
 
-int arr[100100];
-int t[400400];
+struct node
+{
+    int lsum, rsum, msum, tsum;
+    node(int l = 0, int r = 0, int m = 0, int t = 0)
+    {
+        lsum = l;
+        rsum = r;
+        msum = m;
+        tsum = t;
+    }
+};
+
 int n;
-void update(int id, int l, int r, int lu, int ru, int v)
+node tr[1001];
+vector<int> arr;
+
+node merge(node a, node b)
 {
-    if (r < lu || ru < l)
-        return;
-    if (lu <= l && ru >= r) // mist1
+    int m = max(a.msum, max(a.rsum + b.lsum, b.msum));
+    int l = max(a.lsum, a.tsum + b.lsum);
+    int r = max(b.rsum, b.tsum + a.rsum);
+    int t = a.tsum + b.tsum;
+    return node(l, r, m, t);
+}
+
+void build(int i, int l, int r)
+{
+    if (l == r)
     {
-        t[id] += v;
-        //cout << "update tid " << id << " " << t[id] << endl;
+        tr[i] = node(arr[l], arr[l], arr[l], arr[l]);
         return;
     }
-    int mid = (l + r) / 2;
-    update(2 * id, l, mid, lu, ru, v);
-    update(2 * id + 1, mid + 1, r, lu, ru, v);
+    ll m = (l + r) / 2;
+    build(2 * i, l, m);
+    build(2 * i + 1, m + 1, r);
+    tr[i] = merge(tr[2 * i], tr[2 * i + 1]);
 }
-int query(int id, int l, int r, int x)
+
+void update(int i, int l, int r, int x, int v)
 {
-    int sum = 0;
-    if (r < x || l > x)
-        return 0;
+    if (l > x || r < x)
+        return;
     if (l == x && r == x)
-        return t[id];
-    if (l <= x && x <= r) // mist3 
     {
-        sum = t[id];
+        tr[i] = node(v, v, v, v);
+        return;
     }
-    int mid = (l + r) / 2;
-    return sum + query(2 * id, l, mid, x) + query(2 * id + 1, mid + 1, r, x); // mist2
+    ll m = (l + r) / 2;
+    update(2 * i, l, m, x, v);
+    update(2 * i + 1, m + 1, r, x, v);
+    tr[i] = merge(tr[2 * i], tr[2 * i + 1]);
 }
+
+node query(int i, int l, int r, int lef, int rig)
+{
+    if (rig < l || lef > r)
+    {
+        return node(-1e9, -1e9, -1e9, -1e9);
+    }
+    if (lef <= l && r <= rig)
+        return tr[i];
+    ll m = (l + r) / 2;
+    return merge(query(2 * i, l, m, lef, rig), query(2 * i + 1, m + 1, r, lef, rig));
+}
+
 void solve()
 {
-    cin >> n;
+    int q;
+    cin >> n >> q;
+    arr.resize(n);
     for (int i = 0; i < n; i++)
         cin >> arr[i];
-    int t;
-    cin >> t;
-    while (t--)
+    build(1, 0, n - 1);
+    while (q--)
     {
-        int q;
-        cin >> q;
-        if (q == 1)
+        int x;
+        cin >> x;
+        if (x == 1)
         {
-            int l, r, v;
-            cin >> l >> r >> v;
-            update(1, 0, n - 1, l, r, v);
+            int pos, v;
+            cin >> pos >> v;
+            pos--;
+            update(1, 0, n - 1, pos, v);
         }
         else
         {
-            int x;
-            cin >> x;
-            cout << query(1, 0, n - 1, x) + arr[x] << endl;
+            int lef, rig;
+            cin >> lef >> rig;
+            lef--;
+            rig--;
+            cout << query(1, 0, n - 1, lef, rig).msum << "\n";
         }
     }
 }
 
 int main()
 {
-    //fast;
-    ios_base::sync_with_stdio(0), cin.tie(0), cout.tie(0);
+    fast;
     int t = 1;
     //cin >> t;
     while (t--)
