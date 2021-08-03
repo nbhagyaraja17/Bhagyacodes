@@ -8,38 +8,26 @@ using ll = long long;
 
 const int mod = 1e9 + 7;
 
-string s;
-int dp1[1010][1010];
-int rec1(int l, int r){ // returns 1 if from [l..r] is palindrome and this is zero based index, but
-//  we are sending 1 based index values
-    if(l >= r)return 1;
-    if(dp1[l][r]!=-1)return dp1[l][r];
+int n, m;
+int dp[1010][1010];
+vector<vector<char>>arr;
+int rec(int x, int y){
+    if(x > n || y > m)return 0;
+    if(x == n && y== m)return 1;
     int ans = 0;
-    if(s[l-1] == s[r-1] && rec1(l+1,r-1)){ // the only change due to zero and one based index confusion.
-        ans = 1;
-    }
-    return dp1[l][r] = ans;
-}
-
-int dp[100100];
-int rec(int i){// returns no. of min cuts from [1...i]
-    if(i == 0)return -1;
-    if(dp[i]!=-1)return dp[i];
-    int ans = INT_MAX;
-    for(int j = i-1; j>=0; j--){
-        if(rec1(j+1,i)){
-            ans = min(rec(j)+1, ans);
-        }
-    }
-    return dp[i] = ans;
+    if(arr[x][y] == '#')return dp[x][y] = ans;
+    else ans = rec(x+1,y) + rec(x,y+1);
+    return dp[x][y] = ans;
 }
 void solve()
 {
-    cin >> s;
-    int n = (int)s.length();
+    cin >> n >> m;
+    arr.resize(n+1);
+    for(int i = 1; i<=n; i++)arr[i].resize(m+1);
+    for(int i = 1; i<=n; i++)
+        for(int j = 1; j<=m; j++)cin >> arr[i][j];
     memset(dp,-1,sizeof(dp));
-    memset(dp1,-1,sizeof(dp1));
-    cout << rec(n) << "\n";
+    cout << rec(1,1) << "\n";
 }
 
 signed main()
