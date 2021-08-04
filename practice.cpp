@@ -1,62 +1,61 @@
 #include <bits/stdc++.h>
 using namespace std;
-#define fast ios_base::sync_with_stdio(0), cin.tie(0), cout.tie(0)
-using ll = long long;
-#define deb(x) cout << #x << "=" << x << endl
-#define deb2(x, y) cout << #x << "=" << x << "," << #y << "=" << y << endl
 
-const int mod = 1e9 + 7;
-
-vector<int>arr;
-int n, k;
-int F(int t)
+#define int long long
+int n;
+int nn;
+int dp[1001][10001];
+vector<pair<int,int>>vnew;
+int rec(int level, int cur)
 {
-    long long sumtemp = 0;
-    long long cnt = 0;
-    for(int i = 0; i<n; i++){
-        sumtemp += arr[i];
-        if(sumtemp > t){
-            sumtemp = 0;
-            i--;
-            cnt++;
-        }
-    }
-    return cnt<=k;
+    if(level > nn || cur < 0)return INT_MIN;
+    if(level == nn)return 0;
+    if(dp[level][cur]!=-1)return dp[level][cur];
+    int ans = max(rec(level+1,cur), vnew[level].first + rec(level + 1, cur- vnew[level].second));
+    return dp[level][cur] = ans;
 }
-
-void solve()
+signed main()
 {
-    cin >> n >> k;
-    arr.resize(n);
-    ll sum = 0;
-    for(int i = 0; i<n; i++){
-        cin>>arr[i];
-        sum+=arr[i];
-    }
-    int lo =  *max_element(arr.begin(),arr.end());
-    int hi = sum;
-    long long ans = 0;
-    while(lo < hi){
-        int mid = lo + (hi - lo)/2;
-        if(F(mid)){
-            ans = mid;
-            hi = mid-1;
+    cin >> n;
+    vector<pair<int,int>>v(n);
+    for(int i = 0; i<n; i++)cin >> v[i].first >> v[i].second;
+    int Q;
+    cin >> Q;
+    vector<int>mark(n+1);
+    unordered_map<int,vector<int>>ump;
+    int c = 1;
+    while(Q--){
+        int x, y; cin >> x >> y;
+        if(mark[x-1] == 0 && mark[y-1] == 0)
+        {
+            mark[x-1] = c; mark[y-1] = c;
+            ump[c].push_back(x-1); ump[c].push_back(y-1);
+        }
+        else if(mark[x-1] == 0 && mark[y-1]!=0){
+            mark[x-1] = mark[y-1]; ump[mark[y-1]].push_back(x-1);
+        }
+        else if(mark[x-1]!=0 && mark[y-1] == 0){
+            ump[mark[x-1]].push_back(y-1);
+            mark[y-1] = mark[x-1];
         }
         else{
-            lo = mid + 1;
+            auto it = ump.find(mark[y-1]);
+            for(auto val: it->second)ump[mark[x-1]].push_back(val);
+            ump.erase(it);
+            mark[y-1] = mark[x-1];
         }
+        c++;
     }
-    while()
-}
-
-int main()
-{
-    fast;
-    int t = 1;
-    //cin >> t;
-    while (t--)
-    {
-        solve();
+    for(int i = 0; i<n; i++)if(mark[i] == 0)vnew.push_back({v[i].first, v[i].second});
+    for(auto it = ump.begin(); it!= ump.end(); it++){
+        int sk = 0; int wg = 0;
+        for(auto val : it->second)sk+=v[val].first, wg+=v[val].second;
+        vnew.push_back({sk,wg});
     }
+    //for(auto val : vnew)cout << val.first << " " << val.second << "\n";
+    int B; cin >> B;
+    nn = (int)vnew.size();
+    memset(dp,-1,sizeof(dp));
+    cout << rec(0,B) << "\n";
     return 0;
 }
