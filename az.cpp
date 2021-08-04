@@ -12,11 +12,11 @@ int n, m;
 int dp[1010][1010];
 vector<vector<char>>arr;
 int rec(int x, int y){
-    if(x > n || y > m)return 0;
-    if(x == n && y== m)return 1;
+    if(x > n || y > m)return INT_MIN;
+    if(x == n && y== m)return arr[x][y];
     int ans = 0;
-    if(arr[x][y] == '#')return dp[x][y] = ans;
-    else ans = rec(x+1,y) + rec(x,y+1);
+    if(arr[x][y] == '#')return dp[x][y] = INT_MIN;
+    else ans = max(arr[x][y]+rec(x+1,y) , arr[x][y]+rec(x,y+1));
     return dp[x][y] = ans;
 }
 void solve()
