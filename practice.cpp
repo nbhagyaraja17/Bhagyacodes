@@ -1,61 +1,80 @@
 #include <bits/stdc++.h>
 using namespace std;
-
+#define fast ios_base::sync_with_stdio(0), cin.tie(0), cout.tie(0)
 #define int long long
-int n;
-int nn;
-int dp[1001][10001];
-vector<pair<int,int>>vnew;
-int rec(int level, int cur)
-{
-    if(level > nn || cur < 0)return INT_MIN;
-    if(level == nn)return 0;
-    if(dp[level][cur]!=-1)return dp[level][cur];
-    int ans = max(rec(level+1,cur), vnew[level].first + rec(level + 1, cur- vnew[level].second));
-    return dp[level][cur] = ans;
+using ll = long long;
+#define deb(x) cout << #x << "=" << x << endl
+#define deb2(x, y) cout << #x << "=" << x << "," << #y << "=" << y << endl
+
+const int mod = 1e9 + 7;
+int tt=1;
+vector<string>pos;
+vector<int>a;
+string temp;
+int num;
+int len;
+void brute(int level){
+    if(level > len)return;
+    if(level == len-1){pos.push_back(temp);return;}
+    for(int i = 0; i<(int)a.size(); i++){
+        char c = a[i] + '0';
+        temp.push_back(c);
+        brute(level+1);
+        temp.pop_back();
+    }
 }
+int count(int a, int b){
+    int len1 = 0;
+    int len2 = 0;
+    while(a){
+        len1++;
+        a/=10;
+    }
+    while(b){
+        len2++;
+        b/=10;
+    }
+    return len1+len2;
+}
+void solve()
+{
+    int arr[10];
+    for(int i = 0; i<10; i++)
+    {
+        cin >> arr[i];
+        if(arr[i])a.push_back(i);
+    }
+    cin >> num;
+    for(int i = 2; i<=7; i++){
+        len = i;
+        brute(0);
+    }
+    //for(auto s: pos)cout << s << " ";
+    set<int>st;
+    for(auto s: pos)
+    {
+        int n = stoll(s);
+        if(n > num)break;
+        else st.insert(n);
+    }
+    int ans = 1e8;
+    for(auto it = st.begin(); it!=st.end(); it++){
+        if(num%(*it) == 0 && st.find(num/(*it))!=st.end())ans = min(ans, count(*it, *st.find(num/(*it))));
+    }
+    cout <<"Case #" << tt << ": ";
+    if(ans!=1e8)cout << ans+2<<"\n";
+    else cout << "Impossible\n";
+    tt++;
+}
+
 signed main()
 {
-    cin >> n;
-    vector<pair<int,int>>v(n);
-    for(int i = 0; i<n; i++)cin >> v[i].first >> v[i].second;
-    int Q;
-    cin >> Q;
-    vector<int>mark(n+1);
-    unordered_map<int,vector<int>>ump;
-    int c = 1;
-    while(Q--){
-        int x, y; cin >> x >> y;
-        if(mark[x-1] == 0 && mark[y-1] == 0)
-        {
-            mark[x-1] = c; mark[y-1] = c;
-            ump[c].push_back(x-1); ump[c].push_back(y-1);
-        }
-        else if(mark[x-1] == 0 && mark[y-1]!=0){
-            mark[x-1] = mark[y-1]; ump[mark[y-1]].push_back(x-1);
-        }
-        else if(mark[x-1]!=0 && mark[y-1] == 0){
-            ump[mark[x-1]].push_back(y-1);
-            mark[y-1] = mark[x-1];
-        }
-        else{
-            auto it = ump.find(mark[y-1]);
-            for(auto val: it->second)ump[mark[x-1]].push_back(val);
-            ump.erase(it);
-            mark[y-1] = mark[x-1];
-        }
-        c++;
+    fast;
+    int t = 1;
+    //cin >> t;
+    while (t--)
+    {
+        solve();
     }
-    for(int i = 0; i<n; i++)if(mark[i] == 0)vnew.push_back({v[i].first, v[i].second});
-    for(auto it = ump.begin(); it!= ump.end(); it++){
-        int sk = 0; int wg = 0;
-        for(auto val : it->second)sk+=v[val].first, wg+=v[val].second;
-        vnew.push_back({sk,wg});
-    }
-    //for(auto val : vnew)cout << val.first << " " << val.second << "\n";
-    int B; cin >> B;
-    nn = (int)vnew.size();
-    memset(dp,-1,sizeof(dp));
-    cout << rec(0,B) << "\n";
     return 0;
 }
