@@ -1,61 +1,51 @@
 #include <bits/stdc++.h>
 using namespace std;
-
+#define fast ios_base::sync_with_stdio(0), cin.tie(0), cout.tie(0)
 #define int long long
-int n;
-int nn;
-int dp[1001][10001];
-vector<pair<int,int>>vnew;
-int rec(int level, int cur)
+using ll = long long;
+#define all(x) x.begin(), x.end()
+#define rall(x) x.rbegin(), x.rend()
+#define deb(x) cout << #x << "=" << x << endl
+#define deb2(x, y) cout << #x << "=" << x << "," << #y << "=" << y << endl
+
+const int mod = 1e9 + 7;
+
+// find is it possible to have four indices a, b, c, d (repetition allowed) 
+// such that arr[a] + arr[b] + arr[c] + arr[d] == target
+
+// idea : A + B + C + D == target.. splitting A + B to X and C + D to Y
+// getting all the possible A + B i.e, X and mapping them and then checking if any tar - Y presents in our map
+// if presents then that will be our X 
+void solve()
 {
-    if(level > nn || cur < 0)return INT_MIN;
-    if(level == nn)return 0;
-    if(dp[level][cur]!=-1)return dp[level][cur];
-    int ans = max(rec(level+1,cur), vnew[level].first + rec(level + 1, cur- vnew[level].second));
-    return dp[level][cur] = ans;
+    int n, tar; cin >> n >> tar;
+    vector<int>arr(n);
+    for(auto &i: arr)cin >> i;
+    map<int,int>mp;
+    for(int i = 0; i<n; i++){
+        for(int j = i; j<n; j++){
+            mp[arr[i] + arr[j]] = 1;
+        }
+    }
+    for(int i = 0; i<n; i++){
+        for(int j = i; j<n; j++){
+            if(mp[tar - (arr[i] + arr[j])] == 1){
+                cout << "YES\n";
+                return;
+            }
+        }
+    }
+    cout << "NO\n";
 }
+
 signed main()
 {
-    cin >> n;
-    vector<pair<int,int>>v(n);
-    for(int i = 0; i<n; i++)cin >> v[i].first >> v[i].second;
-    int Q;
-    cin >> Q;
-    vector<int>mark(n+1);
-    unordered_map<int,vector<int>>ump;
-    int c = 1;
-    while(Q--){
-        int x, y; cin >> x >> y;
-        if(mark[x-1] == 0 && mark[y-1] == 0)
-        {
-            mark[x-1] = c; mark[y-1] = c;
-            ump[c].push_back(x-1); ump[c].push_back(y-1);
-        }
-        else if(mark[x-1] == 0 && mark[y-1]!=0){
-            mark[x-1] = mark[y-1]; ump[mark[y-1]].push_back(x-1);
-        }
-        else if(mark[x-1]!=0 && mark[y-1] == 0){
-            ump[mark[x-1]].push_back(y-1);
-            mark[y-1] = mark[x-1];
-        }
-        else{
-            auto it = ump.find(mark[y-1]);
-            for(auto val: it->second)ump[mark[x-1]].push_back(val);
-            ump.erase(it);
-            mark[y-1] = mark[x-1];
-        }
-        c++;
+    fast;
+    int t = 1;
+    //cin >> t;
+    while (t--)
+    {
+        solve();
     }
-    for(int i = 0; i<n; i++)if(mark[i] == 0)vnew.push_back({v[i].first, v[i].second});
-    for(auto it = ump.begin(); it!= ump.end(); it++){
-        int sk = 0; int wg = 0;
-        for(auto val : it->second)sk+=v[val].first, wg+=v[val].second;
-        vnew.push_back({sk,wg});
-    }
-    //for(auto val : vnew)cout << val.first << " " << val.second << "\n";
-    int B; cin >> B;
-    nn = (int)vnew.size();
-    memset(dp,-1,sizeof(dp));
-    cout << rec(0,B) << "\n";
     return 0;
 }
