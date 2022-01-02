@@ -11,7 +11,7 @@ using ll = long long;
 const int mod = 1e9 + 7;
 
 // *** WITHOUT REPETITION***
-// find is it possible to have four indices a, b, c, d (without repetition allowed) 
+// find is all four indices a, b, c, d (without repetition allowed) 
 // such that arr[a] + arr[b] + arr[c] + arr[d] == target
 
 // idea : A + B + C + D == target.. splitting A + B to X and C + D to Y
@@ -19,28 +19,32 @@ const int mod = 1e9 + 7;
 // if presents then that will be our X 
 
 
-bool is4sumPossible(vector<int>arr, int n, int tar){
-    map<int,int>mp;
+vector<int> is4sumPossible(vector<int>arr, int n, int tar){
+    map<int,pair<int,int>>mp;
     for(int b = n-3; b>=1; b--){
         for(int a = b-1; a>=0; a--)
         {
-            mp[arr[a] + arr[b]] = 1;
+            mp[arr[a] + arr[b]] = {a,b};
         }
         int c = b+1; 
         for(int d = c+1; d<n; d++){
-            if(mp[tar-(arr[c] + arr[d])]){
-                return 1;
+            if(mp.find(tar-(arr[c] + arr[d])) !=  mp.end()){
+                pair<int,int>ans = mp[tar-(arr[c] + arr[d])];
+                return {c,d, ans.first, ans.second};
             }
         }
     }
-    return 0;
+    return {-1};
 }
 void solve()
 {
     int n, tar; cin >> n >> tar;
     vector<int>arr(n);
     for(auto &i: arr)cin >> i;
-    cout << is4sumPossible(arr, n, tar) << "\n";
+    vector<int>ans = is4sumPossible(arr, n, tar);
+    sort(all(ans));
+    for(auto i : ans)cout << i << " ";
+    cout << "\n";
 }
 
 signed main()
