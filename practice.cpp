@@ -10,32 +10,37 @@ using ll = long long;
 
 const int mod = 1e9 + 7;
 
-// find is it possible to have four indices a, b, c, d (repetition allowed) 
+// *** WITHOUT REPETITION***
+// find is it possible to have four indices a, b, c, d (without repetition allowed) 
 // such that arr[a] + arr[b] + arr[c] + arr[d] == target
 
 // idea : A + B + C + D == target.. splitting A + B to X and C + D to Y
 // getting all the possible A + B i.e, X and mapping them and then checking if any tar - Y presents in our map
 // if presents then that will be our X 
+
+
+bool is4sumPossible(vector<int>arr, int n, int tar){
+    map<int,int>mp;
+    for(int b = n-3; b>=1; b--){
+        for(int a = b-1; a>=0; a--)
+        {
+            mp[arr[a] + arr[b]] = 1;
+        }
+        int c = b+1; 
+        for(int d = c+1; d<n; d++){
+            if(mp[tar-(arr[c] + arr[d])]){
+                return 1;
+            }
+        }
+    }
+    return 0;
+}
 void solve()
 {
     int n, tar; cin >> n >> tar;
     vector<int>arr(n);
     for(auto &i: arr)cin >> i;
-    map<int,int>mp;
-    for(int i = 0; i<n; i++){
-        for(int j = i; j<n; j++){
-            mp[arr[i] + arr[j]] = 1;
-        }
-    }
-    for(int i = 0; i<n; i++){
-        for(int j = i; j<n; j++){
-            if(mp[tar - (arr[i] + arr[j])] == 1){
-                cout << "YES\n";
-                return;
-            }
-        }
-    }
-    cout << "NO\n";
+    cout << is4sumPossible(arr, n, tar) << "\n";
 }
 
 signed main()
