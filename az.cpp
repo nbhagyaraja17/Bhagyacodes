@@ -8,41 +8,54 @@ using ll = long long;
 #define deb(x) cout << #x << "=" << x << endl
 #define deb2(x, y) cout << #x << "=" << x << "," << #y << "=" << y << endl
 
-// ques: given an array. Find no. of subsets whose sum is <= x (including empty subset)
 const int mod = 1e9 + 7;
-int n, x;
-vector<int>arr;
-vector<int>gen(vector<int> a){
-    vector<int>b;
-    for(int i = 0; i < (1 << a.size()); i++){
-        int sum = 0;
-        for(int j = 0; j<a.size(); j++){
-            if((1 << j) & i)sum += a[j];
-        }
-        b.push_back(sum);
+int n;
+set<set<int>>st;
+void generate(int i, int a, int b, int c, int d, vector<int>v)
+{
+    if(i == v.size())
+    {
+        st.insert({a,b,c,d});
+        return;
     }
-    return b;
-}
-int answer(){
-    vector<int>newarr[2];
-    for(int i = 0; i<n; i++){
-        newarr[i&1].push_back(arr[i]);
-    }
-    vector<int>sub0, sub1;
-    sub0 = gen(newarr[0]);
-    sub1 = gen(newarr[1]);
-    int cnt = 0;
-    for(auto v : sub0){
-        cnt += upper_bound(sub1.begin(), sub1.end(), x-v) - sub1.begin();
-    }
-    return cnt;
+    generate(i+1, a+v[i], b, c, d, v);
+    generate(i + 1, a, b + v[i], c, d, v);
+    generate(i + 1, a, b, c + v[i], d, v);
+    generate(i + 1, a, b, c, d + v[i], v);
 }
 void solve()
 {
-    cin >> n >> x;
-    arr.resize(n);
-    for(auto &i: arr)cin >> i;
-    cout << answer() << "\n";
+    cin >> n;
+    vector<int>a, b;
+    int sum = 0;
+    for(int i = 0; i<n; i++){
+        int d; cin >> d;
+        if(i<n/2)a.push_back(d);
+        else b.push_back(d);
+        sum += d;
+    }
+    if(sum % 4 !=  0)
+    {
+        cout << "NO\n";
+        return;
+    }
+    generate(0, 0, 0, 0, 0, a);
+    set<set<int>>posa = st;
+    st.clear();
+    generate(0, 0, 0, 0, 0, b);
+    set<set<int>>posb = st;
+    st.clear();
+    for(auto it : posa)
+    {
+        set<int>temp;
+        for(auto itt: it)temp.insert(sum/4 - itt);
+        if(posb.find(temp) != posb.end())
+        {
+            cout << "YES\n";
+            return;
+        }
+    }
+    cout << "NO\n";
 }
 
 signed main()
