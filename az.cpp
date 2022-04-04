@@ -9,53 +9,25 @@ using ll = long long;
 #define deb2(x, y) cout << #x << "=" << x << "," << #y << "=" << y << endl
 
 const int mod = 1e9 + 7;
-int n;
-set<set<int>>st;
-void generate(int i, int a, int b, int c, int d, vector<int>v)
-{
-    if(i == v.size())
-    {
-        st.insert({a,b,c,d});
-        return;
-    }
-    generate(i+1, a+v[i], b, c, d, v);
-    generate(i + 1, a, b + v[i], c, d, v);
-    generate(i + 1, a, b, c + v[i], d, v);
-    generate(i + 1, a, b, c, d + v[i], v);
-}
+
+// stack 01
+// next greater element to the right 
 void solve()
 {
-    cin >> n;
-    vector<int>a, b;
-    int sum = 0;
-    for(int i = 0; i<n; i++){
-        int d; cin >> d;
-        if(i<n/2)a.push_back(d);
-        else b.push_back(d);
-        sum += d;
-    }
-    if(sum % 4 !=  0)
+    int n; cin >> n;
+    vector<int>arr(n);
+    for(auto &i : arr)cin >> i;
+    stack<int>st;
+    vector<int>ans(n);
+    for(int i = n-1; i>=0; i--)
     {
-        cout << "NO\n";
-        return;
+        while(!st.empty() && st.top() <= arr[i])st.pop();
+        if(st.empty())ans[i] = -1;
+        else ans[i] = st.top();
+        st.push(arr[i]);
     }
-    generate(0, 0, 0, 0, 0, a);
-    set<set<int>>posa = st;
-    st.clear();
-    generate(0, 0, 0, 0, 0, b);
-    set<set<int>>posb = st;
-    st.clear();
-    for(auto it : posa)
-    {
-        set<int>temp;
-        for(auto itt: it)temp.insert(sum/4 - itt);
-        if(posb.find(temp) != posb.end())
-        {
-            cout << "YES\n";
-            return;
-        }
-    }
-    cout << "NO\n";
+    for(auto i : ans)cout << i << " ";
+    cout << "\n";
 }
 
 signed main()
