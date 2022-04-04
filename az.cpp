@@ -10,24 +10,36 @@ using ll = long long;
 
 const int mod = 1e9 + 7;
 
-// stack 01
-// next greater element to the right 
+// max area(rect) histogram problem
 void solve()
 {
     int n; cin >> n;
     vector<int>arr(n);
     for(auto &i : arr)cin >> i;
-    stack<int>st;
-    vector<int>ans(n);
-    for(int i = n-1; i>=0; i--)
-    {
-        while(!st.empty() && st.top() <= arr[i])st.pop();
-        if(st.empty())ans[i] = -1;
-        else ans[i] = st.top();
-        st.push(arr[i]);
+    stack<int>temp;
+    vector<int>left(n),right(n);
+    for(int i  = 0; i<n; i++){
+        while(!temp.empty() && arr[temp.top()] >= arr[i])temp.pop();
+        if(temp.empty())left[i] = i+1;
+        else left[i] = i - temp.top();
+        temp.push(i);
     }
-    for(auto i : ans)cout << i << " ";
-    cout << "\n";
+    while(!temp.empty())temp.pop();
+    for(int i  = n-1; i>=0; i--){
+        while(!temp.empty() && arr[temp.top()] >= arr[i])temp.pop();
+        if(temp.empty())right[i] = n-i;
+        else right[i] = temp.top() - i;
+        temp.push(i);
+    }
+    // for(auto i : left)cout << i << " ";
+    // cout << "\n";
+    // for(auto i : right)cout << i << " ";
+    // cout << "\n";
+    int ans = 0;
+    for(int i = 0; i<n; i++){
+        ans = max(ans, (left[i]+right[i]-1)*arr[i]);
+    }
+    cout << ans << "\n";
 }
 
 signed main()
