@@ -8,41 +8,72 @@ using ll = long long;
 #define deb(x) cout << #x << "=" << x << endl
 #define deb2(x, y) cout << #x << "=" << x << "," << #y << "=" << y << endl
 
-// ques: given an array. Find no. of subsets whose sum is <= x (including empty subset)
 const int mod = 1e9 + 7;
-int n, x;
-vector<int>arr;
-vector<int>gen(vector<int> a){
-    vector<int>b;
-    for(int i = 0; i < (1 << a.size()); i++){
-        int sum = 0;
-        for(int j = 0; j<a.size(); j++){
-            if((1 << j) & i)sum += a[j];
-        }
-        b.push_back(sum);
-    }
-    return b;
-}
-int answer(){
-    vector<int>newarr[2];
+
+// given : binary matrix
+// Cal : max area of histogram containing 1s.
+vector<int>left_smaller_index(vector<int>arr){
+    int n = (int)arr.size();
+    vector<int>ans(n);
+    stack<int>temp;
     for(int i = 0; i<n; i++){
-        newarr[i&1].push_back(arr[i]);
+        while(!temp.empty() && arr[temp.top()] >= arr[i])temp.pop();
+        if(temp.empty())ans[i] = -1;
+        else ans[i] = temp.top();
+        temp.push(i);
     }
-    vector<int>sub0, sub1;
-    sub0 = gen(newarr[0]);
-    sub1 = gen(newarr[1]);
-    int cnt = 0;
-    for(auto v : sub0){
-        cnt += upper_bound(sub1.begin(), sub1.end(), x-v) - sub1.begin();
+    return ans;
+}
+vector<int>right_smaller_index(vector<int>arr){
+    int n = (int)arr.size();
+    vector<int>ans(n);
+    stack<int>temp;
+    for(int i = n-1; i>= 0; i--){
+        while(!temp.empty() && arr[temp.top()] >= arr[i])temp.pop();
+        if(temp.empty())ans[i] = n;
+        else ans[i] = temp.top();
+        temp.push(i);
     }
-    return cnt;
+    return ans;
 }
 void solve()
 {
-    cin >> n >> x;
-    arr.resize(n);
-    for(auto &i: arr)cin >> i;
-    cout << answer() << "\n";
+    int m, n; cin >> m >> n;
+    vector<vector<int>>mat(m, vector<int>(n)), cal(m, vector<int>(n, 0));
+    for(auto &v : mat){
+        for(auto &i : v)cin >> i;
+    }
+    for(int j = 0; j<n; j++){
+        for(int i = 0 ;i<m; i++)
+        {
+            if(mat[i][j] == 0)continue;
+            if(i == 0)
+            {
+                cal[i][j] = max(cal[i][j], mat[i][j]);
+                continue;
+            }
+            cal[i][j] = max(cal[i-1][j], mat[i-1][j]) + 1;
+        }
+    }
+    // for(auto v : cal){
+    //     for(auto i : v)cout << i << " ";
+    //     cout << "\n";
+    // }
+    int ans = 0;
+    for(int i = 0; i<m; i++){
+        vector<int>temp;
+        for(int j = 0; j<n; j++)
+        {
+            temp.push_back(cal[i][j]);
+        }
+        vector<int>lns = left_smaller_index(temp);
+        vector<int>rns = right_smaller_index(temp);
+        for(int i = 0 ;i<n; i++){
+            // deb2(rns[i], lns[i]);
+            ans = max(ans, (rns[i]-lns[i]-1)*temp[i]);
+        }
+    }
+    cout << ans << "\n";
 }
 
 signed main()
