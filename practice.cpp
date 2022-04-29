@@ -10,42 +10,30 @@ using ll = long long;
 
 const int mod = 1e9 + 7;
 
-// 0 1 knapsack problem in top down approach
-// given item wt, item value, bag weight capacity
-// find max value
+// subset sum problem in topdown
 void solve()
 {
-    int n, W; cin >> n >> W;
-    vector<int>wt(n),value(n);
-	for(auto &i : value)cin >> i;
-    for(auto &i : wt)cin >> i;
-    // int W; cin >> W;
-    // int dp[n+1][W+1];
-    vector<vector<int>> dp(n + 1, vector<int>(W + 1));
+    int n, sum; cin >> n >> sum;
+    vector<int>arr(n);
+    for(auto &i : arr)cin >> i;
+    int dp[n+1][sum+1];
     for(int i = 0; i<n+1; i++){
-        for(int j = 0; j<n+1; j++){
-            if(i == 0 || j == 0)dp[i][j] = 0;
+        for(int j = 0; j<sum+1; j++){
+            if(j == 0)dp[i][j] = 1;
+            else if(i == 0)dp[i][j] = 0;
         }
     }
-    for(int i = 1; i<n+1; i++)
-    {
-        for(int j = 1; j<W+1; j++)
-        {
-            if(wt[i-1] <= j){
-                dp[i][j] = max(value[i-1]+dp[i-1][j-wt[i-1]], dp[i-1][j]);
+    for(int i = 1; i<n+1; i++){
+        for(int j = 1; j<sum+1; j++){
+            if(arr[i-1] <= j){
+                dp[i][j] = dp[i-1][j-arr[i-1]] || dp[i-1][j];
             }
-            else{
+            else {
                 dp[i][j] = dp[i-1][j];
             }
         }
     }
-    for(int i = 0; i<n+1; i++){
-        for(int j =0; j<W; j++){
-            cout << dp[i][j] << " ";
-        }
-        cout << "\n";
-    }
-    cout << dp[n][W] << "\n";
+    cout << dp[n][sum] << "\n";
 }
 
 signed main()
