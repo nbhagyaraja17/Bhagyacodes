@@ -9,31 +9,35 @@ using ll = long long;
 #define deb2(x, y) cout << #x << "=" << x << "," << #y << "=" << y << endl
 
 const int mod = 1e9 + 7;
-// find 4 different indices such that their sum is equal to tar(given).
-// O(n^2 logn)
+
+// if we split an array into 2 subsets completely.
+// what is the min sum diff
 void solve()
 {
-    int n, tar; cin >> n >> tar;
+    int n; cin >> n;
     vector<int>arr(n);
     for(auto &i : arr)cin >> i;
-    map<int,pair<int,int>>mp;
-    for(int i = 0; i<n; i++){
-        for(int j = i+1; j<n; j++){
-            int x = arr[i] + arr[j];
-            mp[x] = {i,j};
-        }
-    }
-    for(int i = 0; i<n; i++)
-    {
-        for(int j = i+1; j<n; j++){
-            int y = arr[i] + arr[j];
-            if(mp.find(tar-y) != mp.end() && mp[tar-y].first != i && mp[tar-y].second != i && mp[tar-y].first != j && mp[tar-y].second != j){
-                cout << "YES: " << mp[tar-y].first << " " << mp[tar-y].second << " " << i << " " << j << "\n";
-                return;
+    int sum = accumulate(arr.begin(), arr.end(),0);
+    bool dp[n+1][sum+1];
+    for(int j = 0; j<sum+1; j++)dp[0][j] = false;
+    for(int i = 1; i<n+1; i++)dp[i][0] = true;
+    for(int i = 1; i<n+1; i++){
+        for(int j = 1; j<sum+1; j++){
+            if(arr[i-1] <= j){
+                dp[i][j] = dp[i-1][j-arr[i-1]] || dp[i-1][j];
+            }
+            else{
+                dp[i][j] = dp[i-1][j];
             }
         }
     }
-    cout << "NO\n";
+    int ans = INT_MAX;
+    for(int j=sum; j>=0; j--)
+    {
+        if(dp[n][j])
+            ans = min(ans, abs(sum-2*j));
+    }
+    cout << ans << "\n";
 }
 
 signed main()
