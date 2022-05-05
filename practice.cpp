@@ -10,30 +10,34 @@ using ll = long long;
 
 const int mod = 1e9 + 7;
 
-// subset sum problem in topdown
+// if we split an array into 2 subsets completely.
+// what is the min sum diff
 void solve()
 {
-    int n, sum; cin >> n >> sum;
+    int n; cin >> n;
     vector<int>arr(n);
     for(auto &i : arr)cin >> i;
-    int dp[n+1][sum+1];
-    for(int i = 0; i<n+1; i++){
-        for(int j = 0; j<sum+1; j++){
-            if(j == 0)dp[i][j] = 1;
-            else if(i == 0)dp[i][j] = 0;
-        }
-    }
+    int sum = accumulate(arr.begin(), arr.end(),0);
+    bool dp[n+1][sum+1];
+    for(int j = 0; j<sum+1; j++)dp[0][j] = false;
+    for(int i = 1; i<n+1; i++)dp[i][0] = true;
     for(int i = 1; i<n+1; i++){
         for(int j = 1; j<sum+1; j++){
             if(arr[i-1] <= j){
                 dp[i][j] = dp[i-1][j-arr[i-1]] || dp[i-1][j];
             }
-            else {
+            else{
                 dp[i][j] = dp[i-1][j];
             }
         }
     }
-    cout << dp[n][sum] << "\n";
+    int ans = INT_MAX;
+    for(int j=sum; j>=0; j--)
+    {
+        if(dp[n][j])
+            ans = min(ans, abs(sum-2*j));
+    }
+    cout << ans << "\n";
 }
 
 signed main()
