@@ -10,34 +10,36 @@ using ll = long long;
 
 const int mod = 1e9 + 7;
 
-// if we split an array into 2 subsets completely.
-// what is the min sum diff
-void solve()
-{
-    int n; cin >> n;
-    vector<int>arr(n);
-    for(auto &i : arr)cin >> i;
-    int sum = accumulate(arr.begin(), arr.end(),0);
-    bool dp[n+1][sum+1];
-    for(int j = 0; j<sum+1; j++)dp[0][j] = false;
-    for(int i = 1; i<n+1; i++)dp[i][0] = true;
-    for(int i = 1; i<n+1; i++){
-        for(int j = 1; j<sum+1; j++){
-            if(arr[i-1] <= j){
-                dp[i][j] = dp[i-1][j-arr[i-1]] || dp[i-1][j];
-            }
-            else{
-                dp[i][j] = dp[i-1][j];
-            }
+int n;
+vector<int>arr;
+vector<string>ans;
+void perm(int level, string s, set<int>present){
+    if(level == n){
+        ans.push_back(s);
+        return;
+    }
+    for(int i = 0; i<n; i++){
+        if(present.empty() || (!present.empty() && present.find(i) == present.end()))
+        {
+            string before = s;
+            s += to_string(arr[i]);
+            present.insert(i);
+            perm(level+1, s, present);
+            present.erase(i);
+            s = before;
         }
     }
-    int ans = INT_MAX;
-    for(int j=sum; j>=0; j--)
-    {
-        if(dp[n][j])
-            ans = min(ans, abs(sum-2*j));
+}
+void solve()
+{
+    cin >> n;
+    arr.resize(n);
+    for(auto &i : arr)cin >> i;
+    set<int>p;
+    perm(0, "", p);
+    for(auto i : ans){
+        cout << i << "\n";
     }
-    cout << ans << "\n";
 }
 
 signed main()
