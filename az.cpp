@@ -10,69 +10,33 @@ using ll = long long;
 
 const int mod = 1e9 + 7;
 
-// given : binary matrix
-// Cal : max area of histogram containing 1s.
-vector<int>left_smaller_index(vector<int>arr){
-    int n = (int)arr.size();
-    vector<int>ans(n);
-    stack<int>temp;
-    for(int i = 0; i<n; i++){
-        while(!temp.empty() && arr[temp.top()] >= arr[i])temp.pop();
-        if(temp.empty())ans[i] = -1;
-        else ans[i] = temp.top();
-        temp.push(i);
-    }
-    return ans;
-}
-vector<int>right_smaller_index(vector<int>arr){
-    int n = (int)arr.size();
-    vector<int>ans(n);
-    stack<int>temp;
-    for(int i = n-1; i>= 0; i--){
-        while(!temp.empty() && arr[temp.top()] >= arr[i])temp.pop();
-        if(temp.empty())ans[i] = n;
-        else ans[i] = temp.top();
-        temp.push(i);
-    }
-    return ans;
-}
+int m;
 void solve()
 {
-    int m, n; cin >> m >> n;
-    vector<vector<int>>mat(m, vector<int>(n)), cal(m, vector<int>(n, 0));
-    for(auto &v : mat){
-        for(auto &i : v)cin >> i;
-    }
-    for(int j = 0; j<n; j++){
-        for(int i = 0 ;i<m; i++)
-        {
-            if(mat[i][j] == 0)continue;
-            if(i == 0)
-            {
-                cal[i][j] = max(cal[i][j], mat[i][j]);
-                continue;
-            }
-            cal[i][j] = max(cal[i-1][j], mat[i-1][j]) + 1;
+    string s, t;
+    cin >> s >> t;
+    int m = s.size();
+    int n = t.size();
+    vector<vector<int>>dp(m+1, vector<int>(n+1, 0));
+    for(int i = 1; i<m+1; i++){
+        for(int j = 1; j<n+1; j++){
+            if(s[i-1] == t[j-1])dp[i][j] = 1 + dp[i-1][j-1];
+            else dp[i][j] = max(dp[i-1][j], dp[i][j-1]);
         }
     }
-    // for(auto v : cal){
-    //     for(auto i : v)cout << i << " ";
-    //     cout << "\n";
-    // }
-    int ans = 0;
-    for(int i = 0; i<m; i++){
-        vector<int>temp;
-        for(int j = 0; j<n; j++)
-        {
-            temp.push_back(cal[i][j]);
+    cout << dp[m][n] << "\n";
+    int i = m, j = n;
+    string ans;
+    while(i > 0 && j > 0)
+    {
+        if(dp[i][j] != max(dp[i-1][j], dp[i][j-1])){
+            ans += s[i-1];
+            i--; j--;
         }
-        vector<int>lns = left_smaller_index(temp);
-        vector<int>rns = right_smaller_index(temp);
-        for(int i = 0 ;i<n; i++){
-            // deb2(rns[i], lns[i]);
-            ans = max(ans, (rns[i]-lns[i]-1)*temp[i]);
-        }
+        else if(dp[i-1][j] > dp[i][j-1])i--;
+        else j--;
     }
+    reverse(ans.begin(),ans.end());
     cout << ans << "\n";
 }
 
@@ -80,7 +44,7 @@ signed main()
 {
     fast;
     int t = 1;
-    //cin >> t;
+    // cin >> t;
     while (t--)
     {
         solve();
