@@ -1,2 +1,8 @@
 *.bin
 /.cph
+/.vscode
+az.exe
+practice.exe
+tempCodeRunnerFile.cpp
+workspace.code-workspace
+temp.c

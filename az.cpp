@@ -10,41 +10,58 @@ using ll = long long;
 
 const int mod = 1e9 + 7;
 
-int m;
+vector<int>edges[150005];
+bool visited[150005];
+int n, m;
 void solve()
 {
-    string s, t;
-    cin >> s >> t;
-    int m = s.size();
-    int n = t.size();
-    vector<vector<int>>dp(m+1, vector<int>(n+1, 0));
-    for(int i = 1; i<m+1; i++){
-        for(int j = 1; j<n+1; j++){
-            if(s[i-1] == t[j-1])dp[i][j] = 1 + dp[i-1][j-1];
-            else dp[i][j] = max(dp[i-1][j], dp[i][j-1]);
-        }
-    }
-    cout << dp[m][n] << "\n";
-    int i = m, j = n;
-    string ans;
-    while(i > 0 && j > 0)
+    cin >> n >> m;
+    for(int i = 0; i<m; i++)
     {
-        if(dp[i][j] != max(dp[i-1][j], dp[i][j-1])){
-            ans += s[i-1];
-            i--; j--;
-        }
-        else if(dp[i-1][j] > dp[i][j-1])i--;
-        else j--;
+        int u, v; cin >> u >> v;
+        edges[u].push_back(v);
+        edges[v].push_back(u);
     }
-    reverse(ans.begin(),ans.end());
-    cout << ans << "\n";
+    bool ok = true;
+    for(int i = 1; i<=n; i++)
+    {
+        if(!visited[i]){
+            queue<int>q;
+            q.push(i);
+            vector<int>component;
+            while(!q.empty())
+            {
+                int front = q.front();
+                q.pop();
+                visited[front] = 1;
+                component.push_back(front);
+                for(auto ii : edges[front])
+                {
+                    if(!visited[ii])
+                    {
+                        q.push(ii);
+                        visited[ii] = 1;
+                    }
+                }
+            }
+            for(auto x : component)
+            {
+                if(edges[x].size() != component.size() - 1)
+                {
+                    cout << "NO\n";
+                    return;
+                }
+            }
+        }
+    }
+    cout << "YES\n";
 }
 
 signed main()
 {
     fast;
     int t = 1;
-    // cin >> t;
+    //cin >> t;
     while (t--)
     {
         solve();
