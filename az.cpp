@@ -10,58 +10,40 @@ using ll = long long;
 
 const int mod = 1e9 + 7;
 
-vector<int>edges[150005];
-bool visited[150005];
-int n, m;
 void solve()
 {
-    cin >> n >> m;
-    for(int i = 0; i<m; i++)
-    {
-        int u, v; cin >> u >> v;
-        edges[u].push_back(v);
-        edges[v].push_back(u);
+    int n, tar; cin >> n >> tar;
+    vector<int>arr(n);
+    for(auto &i : arr)cin >> i;
+    map<int, set<int> >mp;
+    for(int i = 0; i<n; i++){
+        for(int j = i+1; j<n; j++)
+        {
+            mp[arr[i] + arr[j]].insert(i);
+            mp[arr[i] + arr[j]].insert(j);
+        }
     }
-    bool ok = true;
-    for(int i = 1; i<=n; i++)
-    {
-        if(!visited[i]){
-            queue<int>q;
-            q.push(i);
-            vector<int>component;
-            while(!q.empty())
+    for(int i = 0; i<n; i++){
+        for(int j = i+1; j<n; j++){
+            int cur = tar - (arr[i] + arr[j]);
+            if(mp.find(cur) != mp.end())
             {
-                int front = q.front();
-                q.pop();
-                visited[front] = 1;
-                component.push_back(front);
-                for(auto ii : edges[front])
+                if(mp[cur].find(j) == mp[cur].end() && mp[cur].find(i) == mp[cur].end())
                 {
-                    if(!visited[ii])
-                    {
-                        q.push(ii);
-                        visited[ii] = 1;
-                    }
-                }
-            }
-            for(auto x : component)
-            {
-                if(edges[x].size() != component.size() - 1)
-                {
-                    cout << "NO\n";
+                    cout << "YES\n";
                     return;
                 }
             }
         }
     }
-    cout << "YES\n";
+    cout << "NO\n";
 }
 
 signed main()
 {
     fast;
     int t = 1;
-    //cin >> t;
+    // cin >> t;
     while (t--)
     {
         solve();

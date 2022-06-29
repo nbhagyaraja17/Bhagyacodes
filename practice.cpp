@@ -30,7 +30,8 @@ void solve()
         // updating ans
         ans = max(ans, (head - tail + 1));
         // move tail one step
-        if(head < tail){
+        if(head < tail)
+        {
             tail++;
             head = tail-1;
         }
