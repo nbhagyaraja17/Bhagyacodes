@@ -11,32 +11,42 @@ using ll = long long;
 
 const int mod = 1e9 + 7;
 
+int cnt[100100];
+int distinct;
+void add(int x)
+{
+    if(cnt[x] == 0)distinct++;
+    cnt[x]++;
+}
+void remove(int x)
+{
+    cnt[x]--;
+    if(cnt[x] == 0)distinct--;
+}
 void solve()
 {
     int n, k; cin >> n >> k;
     vi arr(n);
     for(auto &i : arr)cin >> i;
     int tail = 0;
-    int head = -1; // imp for empty subarray
+    int head = -1;
     int ans = 0;
-    int cntzero = 0;
-    while(tail < n){
-        // push head as far as possible
-        while(head + 1 < n && (arr[head + 1] == 1 or (arr[head + 1] == 0 and cntzero < k)))
+    while(tail < n)
+    {
+        while(head + 1 < n && ((distinct < k) or ( (distinct == k) and (cnt[arr[head + 1]] > 0) )))
         {
             head++;
-            if(arr[head] == 0)cntzero++;
+            add(arr[head]);
         }
-        // updating ans
-        ans = max(ans, (head - tail + 1));
-        // move tail one step
+        ans = max(ans, head - tail + 1);
         if(head < tail)
         {
             tail++;
-            head = tail-1;
+            head = tail - 1;
         }
-        else{
-            if(arr[tail] == 0)cntzero--;
+        else
+        {
+            remove(arr[tail]);
             tail++;
         }
     }
@@ -47,7 +57,7 @@ signed main()
 {
     fast;
     int t = 1;
-    //cin >> t;
+    cin >> t;
     while (t--)
     {
         solve();
