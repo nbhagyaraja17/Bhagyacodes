@@ -11,53 +11,39 @@ using ll = long long;
 
 const int mod = 1e9 + 7;
 
-int cnt[100100];
-int distinct;
-void add(int x)
-{
-    if(cnt[x] == 0)distinct++;
-    cnt[x]++;
-}
-void remove(int x)
-{
-    cnt[x]--;
-    if(cnt[x] == 0)distinct--;
-}
+// find union length and intersection length of n segments
 void solve()
 {
-    int n, k; cin >> n >> k;
-    vi arr(n);
-    for(auto &i : arr)cin >> i;
-    int tail = 0;
-    int head = -1;
-    int ans = 0;
-    while(tail < n)
+    int n; cin >> n;
+    vector<pair<int,int>>events;
+    int L_max = 0, R_min = INT_MAX;
+    for(int i = 0; i<n; i++)
     {
-        while(head + 1 < n && ((distinct < k) or ( (distinct == k) and (cnt[arr[head + 1]] > 0) )))
+        int l, r; cin >> l >> r;
+        L_max = max(L_max, l); R_min = min(R_min, r);
+        events.push_back({l,1});
+        events.push_back({r, -1});
+    }
+    int cnt = 0;
+    int union_len = 0;
+    for(int i = 0; i<(int)events.size(); i++)
+    {
+        cnt += events[i].second;
+        if(cnt > 0 && i + 1 < (int)events.size())
+         // if we want union of >= k segments then replacing cnt >= k
         {
-            head++;
-            add(arr[head]);
-        }
-        ans = max(ans, head - tail + 1);
-        if(head < tail)
-        {
-            tail++;
-            head = tail - 1;
-        }
-        else
-        {
-            remove(arr[tail]);
-            tail++;
+            union_len += (events[i+1].first - events[i].first);
         }
     }
-    cout << ans << "\n";
+    int intersection_len = max(0LL, R_min - L_max);
+    cout << union_len << " " << intersection_len << "\n";
 }
 
 signed main()
 {
     fast;
     int t = 1;
-    cin >> t;
+    //cin >> t;
     while (t--)
     {
         solve();
