@@ -11,32 +11,50 @@ using ll = long long;
 
 const int mod = 1e9 + 7;
 
-// find union length and intersection length of n segments
+// problem : given n segments with l, r, and priority value called x
+// q queries given, for every y value print the highest priority value, if there is no segment at that value print -1
 void solve()
 {
-    int n; cin >> n;
+    int n, q; cin >> n >> q;
     vector<pair<int,int>>events;
-    int L_max = 0, R_min = INT_MAX;
     for(int i = 0; i<n; i++)
     {
-        int l, r; cin >> l >> r;
-        L_max = max(L_max, l); R_min = min(R_min, r);
-        events.push_back({l,1});
-        events.push_back({r, -1});
+        int l, r, x; cin >> l >> r >> x;
+        events.push_back({l, x});
+        events.push_back({r, -x});
     }
-    int cnt = 0;
-    int union_len = 0;
-    for(int i = 0; i<(int)events.size(); i++)
+    sort(all(events));
+    mulitset<int>mst;
+    map<pair<int,int>, int>vals;
+    for(int i = 0; i<events.size(); i++)
     {
-        cnt += events[i].second;
-        if(cnt > 0 && i + 1 < (int)events.size())
-         // if we want union of >= k segments then replacing cnt >= k
+        if(events[i].second < 0)
         {
-            union_len += (events[i+1].first - events[i].first);
+            mst.erase(mst.find(-events[i].second));
+        }
+        else
+        {
+            mst.insert(events[i].second);
+        }
+        if(!mst.empty())
+        {
+            auto it = mst.end(); it--;
+            if(i + 1 < events.size())vals[{events[i].first , events[i+1].first}] = *it;
         }
     }
-    int intersection_len = max(0LL, R_min - L_max);
-    cout << union_len << " " << intersection_len << "\n";
+    while(q--)
+    {
+        int y; cin >> y;
+        auto it = vals.lower_bound({y,0});
+        if(it != vals.begin())
+        {
+            it--;
+            if((it->first).second >= y)
+                cout << it->second << "\n";
+            else cout << "-1\n";
+        }
+        else cout << "-1\n";
+    }
 }
 
 signed main()
