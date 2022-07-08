@@ -11,50 +11,60 @@ using ll = long long;
 
 const int mod = 1e9 + 7;
 
-// problem : given n segments with l, r, and priority value called x
-// q queries given, for every y value print the highest priority value, if there is no segment at that value print -1
+// find if there is any cycle in directed graph, print any cycle elements
+vector<vector<int>>g;
+vector<int>col;
+vector<int>parent;
+bool is_cycle =0;
+vector<int>any_cycle;
+
+void dfs(int node, int par)
+{
+    col[node] = 2;
+    parent[node] = par;
+    for(auto v : g[node])
+    {
+        if(col[v] == 1)
+        {
+            dfs(v, node);
+        }
+        else if(col[v] == 2)
+        {
+            if(is_cycle == 0)
+            {
+                int temp = node;
+                while(temp != v){
+                    any_cycle.push_back(temp);
+                    temp = parent[temp];
+                }
+                any_cycle.push_back(temp);
+                reverse(any_cycle.begin(), any_cycle.end());
+            }
+            is_cycle = 1;
+        }
+    }
+    col[node] = 3;
+}
 void solve()
 {
-    int n, q; cin >> n >> q;
-    vector<pair<int,int>>events;
-    for(int i = 0; i<n; i++)
+    int n, m; cin >> n >> m;
+    g.resize(n+1);
+    for(int i = 0; i<m; i++)
     {
-        int l, r, x; cin >> l >> r >> x;
-        events.push_back({l, x});
-        events.push_back({r, -x});
+        int a, b; cin >> a >> b;
+        g[a].push_back(b);
     }
-    sort(all(events));
-    mulitset<int>mst;
-    map<pair<int,int>, int>vals;
-    for(int i = 0; i<events.size(); i++)
+    col.assign(n+1, 1);
+    parent.assign(n+1, 0);
+    any_cycle.clear();
+    for(int i = 1; i<=n ;i++)
     {
-        if(events[i].second < 0)
+        if(col[i] == 1)
         {
-            mst.erase(mst.find(-events[i].second));
-        }
-        else
-        {
-            mst.insert(events[i].second);
-        }
-        if(!mst.empty())
-        {
-            auto it = mst.end(); it--;
-            if(i + 1 < events.size())vals[{events[i].first , events[i+1].first}] = *it;
+            dfs(i, 0);
         }
     }
-    while(q--)
-    {
-        int y; cin >> y;
-        auto it = vals.lower_bound({y,0});
-        if(it != vals.begin())
-        {
-            it--;
-            if((it->first).second >= y)
-                cout << it->second << "\n";
-            else cout << "-1\n";
-        }
-        else cout << "-1\n";
-    }
+    for(auto i : any_cycle)cout << i << " "; cout << "\n";
 }
 
 signed main()
