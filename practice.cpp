@@ -11,94 +11,59 @@ using ll = long long;
 
 const int mod = 1e9 + 7;
 
-// finding the count of nodes that involved in cycle in directed graphs
-vector<vector<int>>g;
-vector<int>col;
-vector<int>parent;
-bool is_cycle =0;
-vector<int>any_cycle;
-vector<int>prefixorder;
-vector<int>cntcylce;
+using ii = pair<int,int>;
+#define F first
+#define S second
 
-void dfs(int node, int par)
-{
-    col[node] = 2;
-    parent[node] = par;
-    for(auto v : g[node])
+int n, m;
+vector<string>arr;
+int dist[1010][1010];
+
+int dx[] = {1, 0, -1, 0};
+int dy[] = {0, 1, 0, -1};
+
+bool inside(int x, int y){
+    if(x < 0 or x >= n or y < 0 or y >= m or arr[x][y] == '#')return 0;
+    return 1;
+}
+void bfs(ii st){
+    for(int i = 0; i<=n; i++){
+        for(int j = 0; j<=m; j++)dist[i][j] = 1001;
+    }
+    dist[st.F][st.S] = 0;
+    queue<ii>q;
+    q.push(st);
+    while(!q.empty())
     {
-        // if(v == parent[node]) continue;
-        if(col[v] == 1)
+        ii cur = q.front();
+        q.pop();
+        int curd = dist[cur.F][cur.S];
+        for(int k = 0; k<4; k++)
         {
-            dfs(v, node);
-        }
-        else if(col[v] == 2)
-        {
-            if(is_cycle == 0)
+            ii neigh = {cur.F + dx[k], cur.S + dy[k]};
+            if(!inside(cur.F + dx[k], cur.S + dy[k]))continue;
+            if(dist[neigh.F][neigh.S] > curd + 1)
             {
-                int temp = node;
-                while(temp != v){
-                    any_cycle.push_back(temp);
-                    temp = parent[temp];
-                }
-                any_cycle.push_back(temp);
-                reverse(any_cycle.begin(), any_cycle.end());
+                dist[neigh.F][neigh.S] = curd + 1;
+                q.push(neigh);
             }
-            cntcylce[node]++;
-            cntcylce[parent[v]]--;
-            is_cycle = 1;
         }
     }
-    col[node] = 3;
-    prefixorder.push_back(node);
 }
 void solve()
 {
-    int n, m; cin >> n >> m;
-    g.resize(n+1);
-    map<pair<int,int>, int>mp;
-    for(int i = 0; i<m; i++)
-    {
-        int a, b; cin >> a >> b;
-        g[a].push_back(b);
-        // g[b].push_back(a); for undirected
-
-        // Handling multi graphs
-        // int a, b; cin >> a >> b;
-        // if(a == b){
-        //     // self loop
-        // }
-        // if(a > b)swap(a, b);
-        // if(mp[{a,b}] > 1){
-        //     // multiple edges b/w a and b nodes
-        // }
-        // else{
-        //     g[a].push_back(b);
-        // // g[b].push_back(a); for undirected
-        // }
-    }
-    col.assign(n+1, 1);
-    parent.assign(n+1, 0);
-    prefixorder.assign(n+1, 0);
-    cntcylce.assign(n+1, 0);
-    any_cycle.clear();
-    for(int i = 1; i<=n ;i++)
-    {
-        if(col[i] == 1)
-        {
-            dfs(i, 0);
+    cin >> n >> m;
+    arr.resize(n+1);
+    ii st, en;
+    for(int i = 0; i<n ;i++){
+        cin >> arr[i];
+        for(int j = 0; j<m; j++){
+            if(arr[i][j] == 'S')st = {i,j};
+            else if(arr[i][j] == 'E')en = {i,j};
         }
     }
-    // for(auto i : any_cycle)cout << i << " "; cout << "\n";
-    int cnt_nodes = 0;
-    for(auto v : prefixorder)
-    {
-        cntcylce[parent[v]] += cntcylce[v];
-    }
-    for(auto v : cntcylce)
-    {
-        if(v > 0)cnt_nodes++;
-    }
-    cout << cnt_nodes << "\n";
+    bfs(st);
+    cout << dist[en.F][en.S] << "\n";
 }
 
 signed main()
