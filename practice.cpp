@@ -10,40 +10,59 @@ using ll = long long;
 #define deb2(x, y) cout << #x << "=" << x << "," << #y << "=" << y << endl
 
 const int mod = 1e9 + 7;
+using ii = pair<int,int>;
+#define F first
+#define S second
 
+
+int grid[1010][1010];
+bool visited[1010][1010];
 int n, m;
-int dist[100100];
-vector<vector<int>>g;
-
-void bfs(int st){
-    for(int i = 0; i<=n; i++)dist[i] = 1e9;
-    dist[st] = 0;
-    queue<int>q;
-    q.push(st);
-    while(!q.empty()){
-        int cur = q.front();
-        q.pop();
-        for(auto v : g[cur])
-        {
-            if(dist[cur] + 1 < dist[v])
-            {
-                dist[v] = dist[cur] + 1;
-                q.push(v);
-            }
-        }
+int dx[] = {1,0,-1,0};
+int dy[] = {0,1,0,-1};
+bool inside(int x, int y)
+{
+    if(x < 0 or x >= n or y < 0 or y >= m or grid[x][y] == 0 or visited[x][y] == 1)return 0;
+    return 1;
+}
+void dfs(int i, int j)
+{
+    visited[i][j] = 1;
+    for(int k = 0; k<4; k++)
+    {
+        ii neigh = {i+dx[k], j+dy[k]};
+        if(!inside(neigh.F, neigh.S))continue;
+        dfs(neigh.F, neigh.S);
     }
 }
 void solve()
 {
     cin >> n >> m;
-    g.resize(n+1);
-    for(int i = 0; i<m; i++){
-        int x, y; cin >> x >> y;
-        g[x].push_back(y);
+    for(int i = 0; i<n; i++){
+        for(int j = 0; j<m; j++){
+            visited[i][j] = 0;
+            grid[i][j] = 0;
+        }
     }
-    int st, en; cin >> st >> en;
-    bfs(st);
-    cout << dist[en] << "\n";
+    for(int i = 0; i<n; i++)
+    {
+        string s; cin >> s;
+        for(int j = 0; j<m; j++)
+        {
+            if(s[j] == '.')grid[i][j] = 1;
+        }
+    }
+    int cnt = 0;
+    for(int i = 0; i<n; i++){
+        for(int j = 0; j<m; j++){
+            if(inside(i,j))
+            {
+                dfs(i, j);
+                cnt++;
+            }
+        }
+    }
+    cout << cnt << "\n";
 }
 
 signed main()
