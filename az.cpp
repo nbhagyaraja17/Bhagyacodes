@@ -2,6 +2,7 @@
 using namespace std;
 #define fast ios_base::sync_with_stdio(0), cin.tie(0), cout.tie(0)
 #define int long long
+#define vi vector <int>
 using ll = long long;
 #define all(x) x.begin(), x.end()
 #define rall(x) x.rbegin(), x.rend()
@@ -10,40 +11,62 @@ using ll = long long;
 
 const int mod = 1e9 + 7;
 
+int n, m, q;
+vector<vector<int>>g;
+bool visited[100100];
+vector<int>id,sz;
+int cur_ID = 0;
+void dfs(int node)
+{
+    visited[node] = 1;
+    id[node] = cur_ID;
+    sz[cur_ID]++;
+    for(auto v : g[node])
+    {
+        if(!visited[v])dfs(v);
+    }
+}
 void solve()
 {
-    int n, tar; cin >> n >> tar;
-    vector<int>arr(n);
-    for(auto &i : arr)cin >> i;
-    map<int, set<int> >mp;
-    for(int i = 0; i<n; i++){
-        for(int j = i+1; j<n; j++)
+    cin >> n >> m >> q;
+    g.resize(n+1);
+    id.assign(n+1,-1);
+    sz.assign(n+1,0);
+    for(int i = 0; i<m; i++){
+        int x, y; cin >> x >> y;
+        g[x].push_back(y);
+        g[y].push_back(x);
+    }
+    for(int i = 1; i<=n; i++)
+    {
+        if(!visited[i])
         {
-            mp[arr[i] + arr[j]].insert(i);
-            mp[arr[i] + arr[j]].insert(j);
+            dfs(i);
+            cur_ID++;
         }
     }
-    for(int i = 0; i<n; i++){
-        for(int j = i+1; j<n; j++){
-            int cur = tar - (arr[i] + arr[j]);
-            if(mp.find(cur) != mp.end())
-            {
-                if(mp[cur].find(j) == mp[cur].end() && mp[cur].find(i) == mp[cur].end())
-                {
-                    cout << "YES\n";
-                    return;
-                }
-            }
+    while(q--)
+    {
+        int t; cin >> t;
+        if(t == 1)
+        {
+            int x; cin >> x;
+            cout << sz[id[x]] << "\n";
+        }
+        else
+        {
+            int x, y; cin >> x >> y;
+            if(id[x] == id[y])cout << "YES\n";
+            else cout << "NO\n";
         }
     }
-    cout << "NO\n";
 }
 
 signed main()
 {
     fast;
     int t = 1;
-    // cin >> t;
+    //cin >> t;
     while (t--)
     {
         solve();
