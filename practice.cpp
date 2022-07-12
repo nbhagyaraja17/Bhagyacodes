@@ -13,58 +13,44 @@ const int mod = 1e9 + 7;
 
 int n, m;
 vector<vector<int>>g;
-vector<int>col,parent;
-vector<int>any_cycle;
-bool cycle = 0;
-void dfs(int node, int par)
+vector<int>col;
+bool ok = true;
+
+bool dfs(int node, int c)
 {
-    col[node] = 2;
     for(auto v : g[node])
     {
-        if(v == par)continue;
-        if(col[v] == 1)
+        if(col[v] == c)return false;
+        else if(col[v] == -1)
         {
-            parent[v] = node;
-            dfs(v, node);
-        }
-        else if(col[v] == 2)
-        {
-            // storing cycle
-            // if(!cycle)
-            // {
-            //     int temp = node;
-            //     while(temp != v){
-            //         any_cycle.push_back(temp);
-            //         temp = parent[temp];
-            //     }
-            //     any_cycle.push_back(temp);
-            //     reverse(all(any_cycle));
-            // }
-            cycle = 1;
+            col[v] = c^1;
+            return dfs(v, col[v]);
         }
     }
-    col[node] = 3;
+    return true;
 }
+
 void solve()
 {
     cin >> n >> m;
-    col.assign(n+1,1);
-    parent.assign(n+1,-1);
     g.resize(n+1);
+    col.assign(n+1,-1);
     for(int i = 0; i<m; i++)
     {
         int x, y; cin >> x >> y;
         g[x].push_back(y);
         g[y].push_back(x);
     }
-    // cout << "hi\n";
-    for(int i = 1; i<=n ; i++)
-    {
-        if(col[i] == 1)dfs(i, -1);
+    for(int i = 1; i<=n; i++){
+        if(col[i] == -1)
+        {
+            if(!dfs(i, 0)){
+                cout << "NO\n";
+                return;
+            }
+        }
     }
-    cout << (cycle ? "YES\n" : "NO\n");
-    // printing cycle
-    // for(auto i : any_cycle)cout << i << " "; cout << "\n";
+    cout << "YES\n";
 }
 
 signed main()
