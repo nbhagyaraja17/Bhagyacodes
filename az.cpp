@@ -11,28 +11,25 @@ using ll = long long;
 
 const int mod = 1e9 + 7;
 
-int n, m, q;
+int n, m;
 vector<vector<int>>g;
+vector<int>comp_size;
 bool visited[100100];
-vector<int>id,sz;
-int cur_ID = 0;
-void dfs(int node)
+
+void dfs(int node, int &cnt)
 {
     visited[node] = 1;
-    id[node] = cur_ID;
-    sz[cur_ID]++;
+    cnt++;
     for(auto v : g[node])
     {
-        if(!visited[v])dfs(v);
+        if(!visited[v])dfs(v, cnt);
     }
 }
 void solve()
 {
-    cin >> n >> m >> q;
+    cin >> n >> m;
     g.resize(n+1);
-    id.assign(n+1,-1);
-    sz.assign(n+1,0);
-    for(int i = 0; i<m; i++){
+    for(int i = 0 ;i<m; i++){
         int x, y; cin >> x >> y;
         g[x].push_back(y);
         g[y].push_back(x);
@@ -41,25 +38,25 @@ void solve()
     {
         if(!visited[i])
         {
-            dfs(i);
-            cur_ID++;
+            int cnt = 0;
+            dfs(i, cnt);
+            comp_size.push_back(cnt);
         }
     }
-    while(q--)
+    if(comp_size.empty()){
+        cout << "0\n";
+        return;
+    }
+
+    // pairwise product sum
+    int ans = 0;
+    int pre = 0;
+    for(int i = 0; i<(int)comp_size.size(); i++)
     {
-        int t; cin >> t;
-        if(t == 1)
-        {
-            int x; cin >> x;
-            cout << sz[id[x]] << "\n";
-        }
-        else
-        {
-            int x, y; cin >> x >> y;
-            if(id[x] == id[y])cout << "YES\n";
-            else cout << "NO\n";
-        }
+        ans += pre * comp_size[i];
+        pre += comp_size[i];
     }
+    cout << ans << "\n";
 }
 
 signed main()
