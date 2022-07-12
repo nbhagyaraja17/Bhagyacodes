@@ -10,59 +10,61 @@ using ll = long long;
 #define deb2(x, y) cout << #x << "=" << x << "," << #y << "=" << y << endl
 
 const int mod = 1e9 + 7;
-using ii = pair<int,int>;
-#define F first
-#define S second
 
-
-int grid[1010][1010];
-bool visited[1010][1010];
 int n, m;
-int dx[] = {1,0,-1,0};
-int dy[] = {0,1,0,-1};
-bool inside(int x, int y)
+vector<vector<int>>g;
+vector<int>col,parent;
+vector<int>any_cycle;
+bool cycle = 0;
+void dfs(int node, int par)
 {
-    if(x < 0 or x >= n or y < 0 or y >= m or grid[x][y] == 0 or visited[x][y] == 1)return 0;
-    return 1;
-}
-void dfs(int i, int j)
-{
-    visited[i][j] = 1;
-    for(int k = 0; k<4; k++)
+    col[node] = 2;
+    for(auto v : g[node])
     {
-        ii neigh = {i+dx[k], j+dy[k]};
-        if(!inside(neigh.F, neigh.S))continue;
-        dfs(neigh.F, neigh.S);
+        if(v == par)continue;
+        if(col[v] == 1)
+        {
+            parent[v] = node;
+            dfs(v, node);
+        }
+        else if(col[v] == 2)
+        {
+            // storing cycle
+            // if(!cycle)
+            // {
+            //     int temp = node;
+            //     while(temp != v){
+            //         any_cycle.push_back(temp);
+            //         temp = parent[temp];
+            //     }
+            //     any_cycle.push_back(temp);
+            //     reverse(all(any_cycle));
+            // }
+            cycle = 1;
+        }
     }
+    col[node] = 3;
 }
 void solve()
 {
     cin >> n >> m;
-    for(int i = 0; i<n; i++){
-        for(int j = 0; j<m; j++){
-            visited[i][j] = 0;
-            grid[i][j] = 0;
-        }
-    }
-    for(int i = 0; i<n; i++)
+    col.assign(n+1,1);
+    parent.assign(n+1,-1);
+    g.resize(n+1);
+    for(int i = 0; i<m; i++)
     {
-        string s; cin >> s;
-        for(int j = 0; j<m; j++)
-        {
-            if(s[j] == '.')grid[i][j] = 1;
-        }
+        int x, y; cin >> x >> y;
+        g[x].push_back(y);
+        g[y].push_back(x);
     }
-    int cnt = 0;
-    for(int i = 0; i<n; i++){
-        for(int j = 0; j<m; j++){
-            if(inside(i,j))
-            {
-                dfs(i, j);
-                cnt++;
-            }
-        }
+    // cout << "hi\n";
+    for(int i = 1; i<=n ; i++)
+    {
+        if(col[i] == 1)dfs(i, -1);
     }
-    cout << cnt << "\n";
+    cout << (cycle ? "YES\n" : "NO\n");
+    // printing cycle
+    // for(auto i : any_cycle)cout << i << " "; cout << "\n";
 }
 
 signed main()
