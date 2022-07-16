@@ -10,57 +10,51 @@ using ll = long long;
 #define deb2(x, y) cout << #x << "=" << x << "," << #y << "=" << y << endl
 
 const int mod = 1e9 + 7;
+// dijkstra algorithm
 
-// finding topological ordering using dfs and bfs (Kahn's algo) in DAG
+using ii = pair<int,int>;
+#define F first
+#define S second
 int n, m;
-vector<vector<int>>g;
-vector<bool>visited;
-vector<int>topo1,topo2;
+vector<ii>g[100100];
+vector<int>dist, vis;
 
-void dfs(int node)
+void dijkstra(int sc)
 {
-    visited[node] = 1;
-    for(auto v : g[node]){
-        if(!visited[v])dfs(v);
-    }
-    topo1.push_back(node);
-}
-
-vector<int>indeg;
-
-void kahns(){
-    queue<int>q;
-    for(int i = 1; i<=n; i++){
-        if(indeg[i] == 0)q.push(i);
-    }
-    while(!q.empty()){
-        int cur = q.front(); 
-        q.pop();
-        topo2.push_back(cur);
-        for(auto v : g[cur]){
-            indeg[v]--;
-            if(indeg[v] == 0)q.push(v);
+    priority_queue<ii>pq;
+    dist[sc] = 0;
+    pq.push({-0, sc});
+    while(!pq.empty())
+    {
+        ii fs = pq.top(); pq.pop();
+        if(vis[fs.S])continue;
+        vis[fs.S] = 1;
+        for(auto v : g[fs.S])
+        {
+            int neigh = v.F;
+            int weigh = v.S;
+            if(dist[neigh] > dist[fs.S] + weigh)
+            {
+                dist[neigh] = dist[fs.S] + weigh;
+                pq.push({-dist[neigh], neigh});
+            }
         }
     }
 }
 void solve()
 {
     cin >> n >> m;
-    g.resize(n+1);
-    visited.assign(n+1,0);
-    indeg.assign(n+1,0);
+    dist.assign(n+1, 1e18);
+    vis.assign(n+1, 0);
     for(int i = 0; i<m; i++){
-        int x, y; cin >> x >> y;
-        g[x].push_back(y);
-        indeg[y]++;
+        int a, b, c;
+        cin >> a >> b >> c;
+        g[a].push_back({b,c});
+        g[b].push_back({a,c});
     }
-    for(int i = 1; i<=n; i++){
-        if(!visited[i])dfs(i);
-    }
-    kahns();
-    reverse(all(topo1));
-    for(auto v : topo1)cout << v << " "; cout << "\n";
-    for(auto v : topo2)cout << v << " "; cout << "\n";
+    dijkstra(1);
+    int tar; cin >> tar;
+    cout << dist[tar] << "\n";
 }
 
 signed main()
