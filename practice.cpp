@@ -14,38 +14,54 @@ using ii = pair<int,int>;
 
 const int mod = 1e9 + 7;
 
+int n, m;
 vector<vector<ii>>g;
-int dist[505][505];
+vector<pair<ii,int>>edges;
+vector<int>dist;
+vector<bool>vis;
 
-void solve()
-{
-    int n, m, q;
-    cin >> n >> m >> q;
-    g.resize(n+1);
-    for(int i = 1; i<=n; i++){
-        for(int j = 1; j <=n ;j++){
-            if(i == j)dist[i][j] = 0;
-            else dist[i][j] = 1e9;
-        }
-    }
-    for(int i = 0; i<m; i++){
-        int a, b, c; cin >> a >> b >> c;
-        g[a].push_back({b,c});
-        g[b].push_back({a,c});
-        dist[a][b] = dist[b][a] = min(dist[a][b], c);
-    }
-    for(int k = 1; k<=n; k++){
-        for(int i = 1; i<=n; i++){
-            for(int j = 1; j<=n; j++){
-                dist[i][j] = min(dist[i][j], dist[i][k] + dist[k][j]);
+void dijkstra(int sc){
+    dist[sc] = 0;
+    priority_queue<ii>pq;
+    pq.push({0,sc});
+    while(!pq.empty()){
+        ii fr = pq.top(); pq.pop();
+        int neigh = fr.S;
+        if(vis[neigh])continue;
+        vis[neigh] = 1;
+        for(auto v : g[neigh]){
+            if(dist[v.F] > dist[neigh] + v.S){
+                dist[v.F] = dist[neigh] + v.S;
+                pq.push({-dist[v.F], v.F});
             }
         }
     }
-    while(q--){
-        int x, y; cin >> x >> y;
-        if(dist[x][y] >= 1e9)cout << "-1\n";
-        else cout << dist[x][y] << "\n";
+}
+void solve()
+{
+    cin >> n >> m;
+    g.resize(n+1);
+    dist.assign(n+1, 1e18);
+    vis.assign(n+1, false);
+    for(int i = 0; i<m; i++)
+    {
+        int a, b, c;
+        cin >> a >> b >> c;
+        g[a].push_back({b,c});
+        g[b].push_back({a,c});
+        edges.push_back({{a,b}, c});
     }
+    dijkstra(1);
+    int t = -1e18;
+    for(auto v : edges)
+    {
+        int a = v.F.F;
+        int b = v.F.S;
+        int w = v.S;
+        if(abs(dist[a] - dist[b]) == w) t = max(t, max(dist[a], dist[b]) * 10);
+        else t = max(t, (max(dist[a], dist[b]) * 10 + (w - abs(dist[a] - dist[b])) * 5));
+    }
+    cout << t << "\n";
 }
 
 signed main()
