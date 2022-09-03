@@ -1,7 +1,7 @@
 #include <bits/stdc++.h>
 using namespace std;
 #define fast ios_base::sync_with_stdio(0), cin.tie(0), cout.tie(0)
-#define int long long
+// #define int long long
 #define vi vector <int>
 using ll = long long;
 using ii = pair<int,int>;
@@ -14,30 +14,30 @@ using ii = pair<int,int>;
 
 const int mod = 1e9 + 7;
 
-vector<int>prefix_function(string &s){
-    int n = (int)s.size();
-    vector<int>pi(n);
-    for(int i = 1; i<n; i++)
-    {
-        int j = pi[i-1];
-        while(j > 0 && (s[i] != s[j]))
-        {
-            j = pi[j-1];
-        }
-        if(s[i] == s[j])
-        {
-            pi[i] = j + 1;
-        }
-    }
-    return pi;
-}
+#include <ext/pb_ds/assoc_container.hpp>
+using namespace std;
+using namespace __gnu_pbds;
+
+// Declaring Ordered Set
+typedef tree<int, null_type, less<int>, rb_tree_tag, tree_order_statistics_node_update> pbds;
 
 void solve()
 {
-    string s; cin >> s;
-    vector<int>pi = prefix_function(s);
-    for(auto i : pi)cout << i << " ";
-    cout << "\n";
+    long long n, k; cin >> n >> k;
+    pbds ost;
+    for(int i = 1; i<=n; i++)
+    {
+        ost.insert(i);
+    }
+    long long i = k % n;
+    while(!ost.empty())
+    {
+        cout << *(ost.find_by_order(i % (int)ost.size())) << " ";
+        ost.erase(*ost.find_by_order(i % (int)ost.size()));
+        // deb(i);
+        // n--;
+        if((int)ost.size()) i = (i + k) % (int)ost.size();
+    }
 }
 
 signed main()
